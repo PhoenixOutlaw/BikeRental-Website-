@@ -1,0 +1,5 @@
+create new bike entery
+delete new bike entery
+update new bike entery
+show all bike entery
+show one bike entery

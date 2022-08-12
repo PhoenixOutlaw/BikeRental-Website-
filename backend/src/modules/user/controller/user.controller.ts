@@ -1,0 +1,46 @@
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  UseGuards,
+} from "@nestjs/common";
+import { AuthGuard } from "src/guards/auth.guard";
+import { RoleGuard, Roles } from "src/guards/role.guard";
+import { UserService } from "../services/user.service";
+
+@Controller("user")
+@UseGuards(AuthGuard)
+export class UserController {
+  constructor(private readonly services: UserService) {}
+
+  @Get()
+  @UseGuards(RoleGuard)
+  @Roles("admin")
+  getallusers() {
+    return this.services.getallusers();
+  }
+
+  @Get("/:id")
+  @UseGuards(RoleGuard)
+  @Roles("admin")
+  getuser(@Param("id") id: string) {
+    return this.services.getuser(id);
+  }
+
+  @Delete("/:id")
+  @UseGuards(RoleGuard)
+  @Roles("admin")
+  deleteuser(@Param("id") id: string) {
+    return this.services.deleteuser(id);
+  }
+
+  @Patch("/:id")
+  @UseGuards(RoleGuard)
+  @Roles("admin")
+  modifyuser(@Param("id") id: string, @Body() data: any) {
+    return this.services.updateuser(id, data.data);
+  }
+}
