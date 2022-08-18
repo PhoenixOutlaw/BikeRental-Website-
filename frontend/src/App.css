@@ -31,7 +31,8 @@
 .margin-bottom-m{margin-bottom:3rem;}
 .margin-bottom-x{margin-bottom:5rem;}
 .margin-auto{margin:auto;}
-
+.m0{margin: 0;}
+.p0{padding: 0;}
 .padding-top-s{padding-top:1rem;}
 .padding-top-m{padding-top:3rem;}
 .padding-top-x{padding-top:5rem;}
@@ -68,24 +69,28 @@
   text-transform: uppercase;
   font-weight: 500;
 }
-.heading--primary{
+.heading-m{
   font-size: 2.5rem;
 }
-.heading--secondary{
+.heading-s{
   font-size: 1.5rem;
 }
-/* .heading--primary{
-  font-size: 2.5rem;
-  font-weight: 500;
-} */
+
 .p{text-transform: capitalize; font-weight: 500;}
 .p-s{font-size: .8rem;}
 .p-m{font-size: 1rem;}
+.nowrap{white-space: nowrap;}
 
+.border{border:solid  thin;}
 
 .overflow-h,.text-ellipsis{overflow:hidden;}
 .text-ellipsis{text-overflow:ellipsis;white-space: nowrap;}
+.overflow-auto{overflow:auto; max-height:100vh}
+.overflow-auto::-webkit-scrollbar{display:none}
+
 .btn{  
+  background:inherit;
+  border: none;
   display:inline-block;
   cursor: pointer;
   text-transform: capitalize;
@@ -156,7 +161,7 @@
 
 .overlay{
   position: absolute;
-  background: rgba(0, 0, 0, 0.188);
+  background: rgba(0, 0, 0, 0.827);
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
   min-width: 100%;
@@ -165,32 +170,10 @@
   top: 0;
   left: 0;
   }
-.card{
-  border: solid thin;
-  border-radius: 5px;
-  font-size: 1.2rem;
-  padding: .5rem 1rem;
-  text-align: left;
-}
+.fullwidth{width: 100%;}
+  .navbar{
+    font-size: 1.5rem;
+    background:rgb(12, 24, 50);
+    color: white;
+  }
 
-.user--card{ 
-  width:80%;
-}
-.review--card{ 
-  width:100%;
-  padding: 1.5rem 1rem;
-  border-radius: 10px;
-}
-.comment-box{ 
-  width: 100%;
-  padding: 1.5rem 1rem;
-  border-radius: 10px;
-}
-.infocard{ 
-  position: relative;
-  margin-top:5rem;
-  padding: 2rem 3rem;
-  background: whitesmoke;
-  width: 80%;
-  color: black;
-}

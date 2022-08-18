@@ -20,10 +20,25 @@ export class BikesService {
     }
   }
 
-  async getallbike() {
+  async getallbike(params: any) {
     try {
-      const res = await this.bikerepo.find();
-      return res;
+      const pagination = {
+        page: parseInt(params.page) || 1,
+        limit: parseInt(params.limit) || 10,
+      };
+    
+      const offset = (pagination.page - 1) * pagination.limit;
+      const query =
+        (params.search ? "name like :name" : "") +
+        (params.search && params.rating ? " AND " : "") +
+        (params.rating ? "avgrating>=:rating" : "");
+      const total = await this.bikerepo.createQueryBuilder().getCount()
+      const res = await this.bikerepo.createQueryBuilder()
+      .where(query, { name: `%${params.search}%`, rating: params.rating })
+      .offset(offset)
+      .limit(pagination.limit)
+      .getMany();
+      return {total,data: res};
     } catch (err) {
       throw new HttpException(err.message, err.status);
     }
@@ -33,7 +48,6 @@ export class BikesService {
     const relations = ['reviews'];
     if(role === "admin")
     relations.push('reservations');
-    console.log(relations)
     try {
       const res = await this.bikerepo.findOneOrFail({ where: { id: id }, relations:relations });
       return res;

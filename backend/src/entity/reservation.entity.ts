@@ -1,4 +1,11 @@
-import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { Bike } from "./bike.entity";
 import { User } from "./user.entity";
 
@@ -10,16 +17,18 @@ export class Reservation extends BaseEntity {
   @Column()
   duration: number;
 
+  @CreateDateColumn()
+  created_at: Date;
 
-  @ManyToOne(()=>Bike, (bike)=>bike.reservations,{
-    onDelete:'CASCADE',
-    onUpdate: 'CASCADE'
+  @ManyToOne(() => Bike, (bike) => bike.reservations, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   })
   bike: Bike;
 
-  @ManyToOne(()=>User, (user)=>user.reservations,{
-    onDelete:'CASCADE',
-    onUpdate: 'CASCADE'
+  @ManyToOne(() => User, (user) => user.reservations, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   })
   user: User;
 }

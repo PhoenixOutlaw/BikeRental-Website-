@@ -1,0 +1,11 @@
+backend
+add dto validation  with jwt
+avgreview
+
+frontend 
+admin dashboard
+user dashboard
+
+
+
+

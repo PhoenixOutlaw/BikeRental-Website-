@@ -2,8 +2,9 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
-  Header,
+  Get,
   Headers,
+  HttpCode,
   Post,
   UseInterceptors,
 } from "@nestjs/common";
@@ -14,19 +15,22 @@ import { AuthService } from "../services/Auth.service";
 @UseInterceptors(ClassSerializerInterceptor)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-
+  
   @Post("signin")
+  @HttpCode(200)
   signin(@Body() data: Signin_userdto): any {
     return this.authService.signin(data);
   }
-
-  @Post("logged")
-  getloggeduser(@Headers() jwt:any): any {
-    return this.authService.getloggeduser(jwt.authorization.split(' ')[1])
-  }
-
+  
   @Post("register")
+  @HttpCode(200)
   register(@Body() data: Create_UserDto): any {
     return this.authService.register(data);
+  }
+  
+  @Get("logged")
+  @HttpCode(200)
+  getloggeduser(@Headers() jwt: any): any {
+    return this.authService.getloggeduser(jwt.authorization.split(" ")[1]);
   }
 }

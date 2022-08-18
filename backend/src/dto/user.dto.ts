@@ -1,6 +1,6 @@
 import { PartialType } from "@nestjs/mapped-types";
 import { Exclude } from "class-transformer";
-import { IsEmail, IsString, Matches, MinLength } from "class-validator";
+import { IsEmail, IsOptional, IsString, Matches, MinLength } from "class-validator";
 
 
 export class Create_UserDto  {
@@ -13,6 +13,7 @@ export class Create_UserDto  {
     @IsEmail({},{message: 'email invalid'})
     email: string;
 
+    @IsOptional()
     @Matches(/(admin)|(regular)/,{message: 'role can me admin or regular only'}) 
     role: string;
     

@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   Patch,
   UseGuards,
@@ -17,6 +18,7 @@ export class UserController {
   constructor(private readonly services: UserService) {}
 
   @Get()
+  @HttpCode(200)
   @UseGuards(RoleGuard)
   @Roles("admin")
   getallusers() {
@@ -24,6 +26,7 @@ export class UserController {
   }
 
   @Get("/:id")
+  @HttpCode(200)
   @UseGuards(RoleGuard)
   @Roles("admin")
   getuser(@Param("id") id: string) {
@@ -31,6 +34,7 @@ export class UserController {
   }
 
   @Delete("/:id")
+  @HttpCode(200)
   @UseGuards(RoleGuard)
   @Roles("admin")
   deleteuser(@Param("id") id: string) {
@@ -38,6 +42,7 @@ export class UserController {
   }
 
   @Patch("/:id")
+  @HttpCode(200)
   @UseGuards(RoleGuard)
   @Roles("admin")
   modifyuser(@Param("id") id: string, @Body() data: any) {

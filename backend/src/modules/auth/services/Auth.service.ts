@@ -39,7 +39,6 @@ export class AuthService {
   async signin(data: Signin_userdto) {
     try {
       const res = await this.user.findOneByOrFail({ email: data.email });
-      console.log(await bcrypt.compare(data.password, res.password));
       if (!(await bcrypt.compare(data.password, res.password))) {
         throw new HttpException("Password incorrect", HttpStatus.FORBIDDEN);
       }
