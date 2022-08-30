@@ -3,8 +3,11 @@ import { message } from "antd";
 import { getallbikes, getbike } from "./bikeAPI";
 
 const initialState = {
-  bikes: [],
+  availablebikes: [],
+  unavailablebikes: [],
+  filter:{},
   total: 0,
+  currentbike:undefined,
   status: "idle",
 };
 
@@ -12,15 +15,12 @@ export const bikeSlice = createSlice({
   name: "bike",
   initialState,
   reducers: {
-    // signin(state) {
-    //   state.signedIn = true;
-    // },
-    // signout(state) {
-    //   state.signedIn = false;
-    //   state.bikes = undefined;
-    //   state.accessToken = undefined;
-    //   Cookies.remove("token")
-    // },
+   currentbike:(state,action)=>{
+    state.currentbike = action.payload
+   },
+   newfilter:(state,action)=>{
+    state.filter = action.payload
+   }
   },
 
   extraReducers: (builder) => {
@@ -30,7 +30,10 @@ export const bikeSlice = createSlice({
       })
       .addCase(getallbikes.fulfilled, (state, action) => {
         state.status = "idle";
-        state.bikes = action.payload.data;
+        if(action.payload.data?.available)
+        state.availablebikes = action.payload.data.available;
+        if(action.payload.data?.unavailable)
+        state.unavailablebikes = action.payload.data.unavailable;
         state.total = action.payload.total;
       })
       .addCase(getallbikes.rejected, (state, action) => {
@@ -49,22 +52,9 @@ export const bikeSlice = createSlice({
         state.status = "failed";
         message.error(action?.payload.message);
       });
-
-    // builder
-    //   .addCase(getloggeduser.pending, (state) => {
-    //     state.status = "loading";
-    //   })
-    //   .addCase(getloggeduser.fulfilled, (state, action) => {
-    //     state.status = "idle";
-    //     state.bikes = action.payload;
-    //   })
-    //   .addCase(getloggeduser.rejected, (state, action) => {
-    //     state.status = "failed";
-    //     message.error(action?.payload.message);
-    //   });
   },
 });
 
-export const { signin, signout } = bikeSlice.actions;
+export const { currentbike,newfilter } = bikeSlice.actions;
 export const selectCount = (state) => state.counter.value;
 export default bikeSlice.reducer;

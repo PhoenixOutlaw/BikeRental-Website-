@@ -1,5 +1,6 @@
 import { BaseEntity, Column, Entity, Index, JoinColumn, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { Reservation } from "./reservation.entity";
+import { Review } from "./review.entity";
 
 
 @Entity()
@@ -25,4 +26,8 @@ export class User extends BaseEntity {
   @JoinColumn()
   @OneToMany(()=>Reservation , (reservation)=>reservation.user)
   reservations: Reservation[];
+
+  @JoinColumn()
+  @OneToMany(()=>Review , (reviews)=>reviews.user)
+  reviews: Review[];
 }

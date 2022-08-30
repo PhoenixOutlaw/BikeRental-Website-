@@ -7,7 +7,7 @@ export const addbike = createAsyncThunk(
   async (payload, { rejectWithValue,dispatch }) => {
     try {
       const res = (await api.post(`/bike`, payload)).data;
-      dispatch(getallbikes())
+      dispatch(getallbikes({}))
       return res;
     } catch (err) {
       return rejectWithValue(err.response.data);
@@ -21,7 +21,7 @@ export const updatebike = createAsyncThunk(
     try {
       const res = (await api.patch(`/bike/${payload.id}`, payload.updates))
         .data;
-      dispatch(getallbikes())
+      dispatch(getallbikes({}))
         return res;
     } catch (err) {
       return rejectWithValue(err.response.data);
@@ -34,7 +34,7 @@ export const deletebike = createAsyncThunk(
   async (id, { rejectWithValue,dispatch }) => {
     try {
       const res = (await api.delete(`/bike/${id}`)).data;
-      dispatch(getallbikes())
+      dispatch(getallbikes({}))
       return res;
     } catch (err) {
       return rejectWithValue(err.response.data);

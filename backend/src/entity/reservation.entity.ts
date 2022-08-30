@@ -15,7 +15,14 @@ export class Reservation extends BaseEntity {
   id: string;
 
   @Column()
-  duration: number;
+  from: Date;
+
+  @Column()
+  to: Date;
+
+  @Column({default:true})
+  active: boolean;
+
 
   @CreateDateColumn()
   created_at: Date;

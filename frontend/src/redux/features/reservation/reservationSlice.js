@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { message } from "antd";
-import { addreservation, deletereservation, updatereservation } from "./reservationAPI";
+import { addreservation, deletereservation, getreservation, updatereservation } from "./reservationAPI";
 
 const initialState = {
 };
@@ -11,6 +11,18 @@ export const reservationSlice = createSlice({
   reducers: {},
 
   extraReducers: (builder) => {
+    builder
+      .addCase(getreservation.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getreservation.fulfilled, (state, action) => {
+        state.status = "idle";
+      })
+      .addCase(getreservation.rejected, (state, action) => {
+        state.status = "failed";
+        message.error(action?.payload?.message);
+      });
+      
     builder
       .addCase(addreservation.pending, (state) => {
         state.status = "loading";
@@ -43,7 +55,7 @@ export const reservationSlice = createSlice({
       })
       .addCase(updatereservation.fulfilled, (state, action) => {
         state.status = "idle";
-        message.success("Reservation updated successfully");
+        message.success("Reservation status updated successfully");
       })
       .addCase(updatereservation.rejected, (state, action) => {
         state.status = "failed";

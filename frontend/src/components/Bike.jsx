@@ -9,36 +9,23 @@ import { DeleteOutlined, EditOutlined, UserOutlined } from "@ant-design/icons";
 import { validjwt } from "../utils/fnc";
 import { message, Modal, Rate } from "antd";
 import { addreview, deletereview } from "../redux/features/review/reviewAPI";
-import { modifyreview } from "../redux/features/review/reviewSlice";
 import { updatereview as update } from "../redux/features/review/reviewAPI";
-import { AddReservation } from "./AddReservation";
-import {
-  addreservation,
-  deletereservation,
-} from "../redux/features/reservation/reservationAPI";
+import { deletereservation } from "../redux/features/reservation/reservationAPI";
 
-export const Bike = () => {
+const Bike = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const role = useSelector((state) => state.login.user.role);
-  const [bike, setbike] = useState(undefined);
+  const bike = useSelector((state) => state.bike.currentbike);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isModal2Visible, setIsModal2Visible] = useState(false);
   const [updatereview, setupdatereview] = useState({
     id: "",
     review: "",
     rating: 0,
   });
 
-  function toDateTime(secs) {
-    var t = new Date(1970, 0, 1);
-    t.setSeconds(secs);
-    return t.toString().split(" GMT")[0];
-  }
   useEffect(() => {
-    validjwt(() =>
-      dispatch(getbike({ id: id, success: (data) => setbike(data) }))
-    );
+    validjwt(() => dispatch(getbike(id)));
   }, [dispatch, id]);
 
   return (
@@ -49,11 +36,7 @@ export const Bike = () => {
         setIsModalVisible={setIsModalVisible}
         visible={isModalVisible}
       />
-      <AddReservation
-        visible={isModal2Visible}
-        setvisible={setIsModal2Visible}
-        id={id}
-      />
+
       <div className="d-flex--c fullwidth ">
         <div className="box-shadow padding-lr-s padding-bottom-s ">
           <div>
@@ -63,26 +46,20 @@ export const Bike = () => {
             <p className="p p-s m0 "> color :{bike?.color}</p>
             <Rate
               allowHalf
-              defaultValue={bike?.rating}
+              value={bike?.avgrating}
               count={5}
               disabled={true}
               className="lightgray"
             />
           </div>
-          <button
-            className="btn btn-secondary margin-top-s"
-            onClick={() => setIsModal2Visible(true)}
-          >
-            Add Reservations
-          </button>
         </div>
 
         <div className="reviews  margin-top-s">
-          <div className="d-flex justify-center margin-bottom-m">
+          <div className="d-flex justify-center margin-bottom-s">
             <Addreview id={id} />
           </div>
-          {bike?.reviews.length && (
-            <>
+          {bike?.reviews?.length && (
+            <div className="padding-bottom-m">
               <h3 className="heading-s text-center ">Reviews</h3>
               {bike?.reviews.map((review) => (
                 <Review
@@ -93,21 +70,30 @@ export const Bike = () => {
                   setupdatereview={setupdatereview}
                 />
               ))}
-            </>
+            </div>
           )}
         </div>
       </div>
-      {bike?.reservations.length > 0 && (
-        <div className="padding-lr-s box-shadow">
+      {bike?.reservations?.length > 0 && (
+        <div className="padding-lr-s box-shadow padding-top-s">
           <h2 className="heading heading-s text-center">Reservations</h2>
           <div className="d-flex--c gutter-s overflow-auto padding-bottom-x">
             {bike.reservations.map((reservation, i) => (
-              <div className="border light-gray padding-lr-s padding-bottom-s padding-top-s">
+              <div
+                className="border light-gray padding-lr-s padding-bottom-s padding-top-s"
+                key={reservation.id}
+              >
                 <div className="d-flex gutter-s">
                   <p className="p p-s">#{i + 1}</p>
                   <div className="d-flex--c overflow-h bg-white p p-s">
                     <p className="text-overflow p p-s">{reservation.id}</p>
-                    <p>{toDateTime(reservation.duration)}</p>
+                    {reservation.active ? (
+                      <p className="p p-s text dot dot--green">active</p>
+                    ) : (
+                      <p className="p p-s text dot dot--red">canceled</p>
+                    )}
+                    <p className="nowrap">from : {reservation.from}</p>
+                    <p className="nowrap">to : {reservation.to}</p>
                   </div>
                 </div>
                 {role === "admin" && (
@@ -116,7 +102,12 @@ export const Bike = () => {
                       className="btn btn-delete p-m"
                       onClick={() => {
                         validjwt(() =>
-                          dispatch(deletereservation(reservation.id))
+                          dispatch(
+                            deletereservation({
+                              id: reservation.id,
+                              type: "admin",
+                            })
+                          )
                         );
                       }}
                     />
@@ -136,7 +127,7 @@ const Review = ({ details, popup, updatereview, setupdatereview }) => {
   const dispatch = useDispatch();
   const role = useSelector((state) => state.login.user.role);
   return (
-    <div className="d-flex gutter-s box-shadow padding-lr-s padding-bottom-s padding-top-s">
+    <div className="d-flex gutter-s box-shadow padding-lr-s padding-bottom-s padding-top-s margin-bottom-s">
       <div>
         <Avatar size={54} icon={<UserOutlined />} />
       </div>
@@ -167,6 +158,8 @@ const Review = ({ details, popup, updatereview, setupdatereview }) => {
   );
 };
 
+export default Bike;
+
 const Addreview = ({ id, type, values, update }) => {
   const email = useSelector((state) => state.login.user.email);
   const dispatch = useDispatch();
@@ -190,12 +183,13 @@ const Addreview = ({ id, type, values, update }) => {
         })
       )
     );
+    setreview(defaultValue);
   }
 
   return (
     <div
       className={
-        "d-flex padding-lr-x padding-bottom-s padding-top-s gutter-s margin-bottom-s" +
+        "d-flex padding-lr-x padding-bottom-s padding-top-s gutter-s " +
         (!type ? "box-shadow" : "")
       }
     >

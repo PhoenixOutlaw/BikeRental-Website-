@@ -28,7 +28,7 @@ export class Bike extends BaseEntity {
 
   @Column({ default: 0 })
   avgrating: number;
-
+ 
   @JoinColumn()
   @OneToMany(() => Review, (reviews) => reviews.bike)
   reviews: Review[];

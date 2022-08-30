@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Bike } from "./bike.entity";
+import { User } from "./user.entity";
 
 @Entity()
 export class Review {
@@ -31,4 +32,11 @@ export class Review {
   })
   @JoinColumn()
   bike: Bike;
+
+  @ManyToOne(() => User, (user) => user.reviews, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+  })
+  @JoinColumn()
+  user: User;
 }

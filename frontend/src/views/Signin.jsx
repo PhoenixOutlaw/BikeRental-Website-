@@ -12,7 +12,6 @@ import validator from "validator";
 import React from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import 'antd/dist/antd.min.css'
 import {
   login,
   register as registerapi,

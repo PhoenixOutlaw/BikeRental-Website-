@@ -1,11 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { message } from "antd";
+import axios from "axios";
 import Cookies from "js-cookie";
-import { getloggeduser, login, register } from "./loginAPI";
+import api from "../../../axios/axiosconfig";
+import { getloggeduser, login, register, registeruser } from "./loginAPI";
 
 const initialState = {
   user: undefined,
   accessToken: undefined,
+  reservations: undefined,
   signedIn: false,
   status: "idle",
 };
@@ -14,6 +17,9 @@ export const loginSlice = createSlice({
   name: "login",
   initialState,
   reducers: {
+    reservation:(state, action)=>{
+      state.reservations= action.payload
+    },
     signin(state) {
       state.signedIn = true;
     },
@@ -57,6 +63,19 @@ export const loginSlice = createSlice({
       });
 
     builder
+      .addCase(registeruser.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(registeruser.fulfilled, (state, action) => {
+        state.status = "idle";
+        message.success("user registered successfully");
+      })
+      .addCase(registeruser.rejected, (state, action) => {
+        state.status = "failed";
+        message.error(action?.payload.message);
+      });
+
+    builder
       .addCase(getloggeduser.pending, (state) => {
         state.status = "loading";
       })
@@ -71,6 +90,6 @@ export const loginSlice = createSlice({
   },
 });
 
-export const { signin, signout } = loginSlice.actions;
+export const { signin, signout,reservation } = loginSlice.actions;
 export const selectCount = (state) => state.counter.value;
 export default loginSlice.reducer;

@@ -36,6 +36,7 @@ export class Signin_userdto{
 }
 
 export class Serialized_user {
+     reservations:any[];
     @Exclude()
     password: string;
     constructor(partial: Partial<Create_UserDto>) {

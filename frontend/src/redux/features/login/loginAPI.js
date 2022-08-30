@@ -31,6 +31,19 @@ export const register = createAsyncThunk(
     }
   }
 );
+
+export const registeruser = createAsyncThunk(
+  "log/register_admin",
+  async (payload, { rejectWithValue }) => {
+    delete payload.data.repassword;
+    try {
+      const res = (await api.post("/register", payload.data)).data;
+      return res;
+    } catch (err) {
+      return rejectWithValue(err.response.data);
+    }
+  }
+);
 export const getloggeduser = createAsyncThunk(
   "log/getloggeduser",
   async (payload, { rejectWithValue, getstate }) => {
@@ -42,3 +55,4 @@ export const getloggeduser = createAsyncThunk(
     }
   }
 );
+

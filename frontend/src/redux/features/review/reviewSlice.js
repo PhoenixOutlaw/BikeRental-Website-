@@ -16,7 +16,7 @@ export const reviewSlice = createSlice({
       })
       .addCase(addreview.fulfilled, (state, action) => {
         state.status = "idle";
-        message.success(action?.payload);
+        console.log(action?.payload);
       })
       .addCase(addreview.rejected, (state, action) => {
         state.status = "failed";

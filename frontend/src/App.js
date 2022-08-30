@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { lazy, Suspense, useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { Main } from "./views/Main";
@@ -11,7 +11,11 @@ import { Bars } from "react-loader-spinner";
 import { validjwt } from "./utils/fnc";
 import { Auth } from "./components/Auth";
 import { Bikes } from "./components/Bikes";
-import { Bike } from "./components/Bike";
+import api from "./axios/axiosconfig";
+
+const  Bike = lazy(()=> import("./components/Bike"));
+const  Dashboard = lazy(()=> import("./views/Dashboard"));
+const  Profile = lazy(()=> import("./views/Profile"));
 
 function App() {
   const user = useSelector((state) => state.login.accessToken);
@@ -20,6 +24,9 @@ function App() {
   const dispatch = useDispatch();
   useEffect(() => {
     const token = Cookies.get("token");
+    if(token) {
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
     if (!user && token) {
       validjwt(() => dispatch(getloggeduser()));
     }
@@ -29,34 +36,44 @@ function App() {
   return (
     <div className="App">
       {status === "loading" || loading ? (
-        <div className="overlay d-flex justify-center align-center">
-          <Bars
-            height="80"
-            width="80"
-            color="#4fa94d"
-            ariaLabel="bars-loading"
-            wrapperStyle={{}}
-            wrapperClass=""
-            visible={true}
-          />
-        </div>
+        <Loader />
       ) : (
-        <Routes>
-          <Route path="/" element={<Auth role={[]} element={<Main />} />}>
-            <Route index element={<Bikes />} />
-            <Route path="/bike/:id" element={<Bike />} />
-            <Route
-              path="/dashboard"
-              element={<Auth role={["admin"]} element={<h1>dashboard</h1>} />}
-            />
-          </Route>
-          <Route path="login" element={<Signin />} />
-          <Route path="register" element={<Signin register={true} />} />
-          <Route path="/*" element={<Navigate to="/" />} />
-        </Routes>
+        <Suspense fallback={<Loader/>}>
+          <Routes>
+            <Route path="/" element={<Auth role={[]} element={<Main />} />}>
+              <Route index element={<Bikes />} />
+              <Route path="/bike/:id" element={<Bike />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/user/:id" element={<Auth role={['admin']} element={<Profile />}/>} />
+              <Route
+                path="/dashboard"
+                element={<Auth role={["admin"]} element={<Dashboard />} />}
+              />
+            </Route>
+            <Route path="login" element={<Signin />} />
+            <Route path="register" element={<Signin register={true} />} />
+            <Route path="/*" element={<Navigate to="/" />} />
+          </Routes>
+        </Suspense>
       )}
     </div>
   );
 }
 
 export default App;
+
+const Loader = () => {
+  return (
+    <div className="overlay d-flex justify-center align-center">
+      <Bars
+        height="80"
+        width="80"
+        color="#4fa94d"
+        ariaLabel="bars-loading"
+        wrapperStyle={{}}
+        wrapperClass=""
+        visible={true}
+      />
+    </div>
+  );
+};
