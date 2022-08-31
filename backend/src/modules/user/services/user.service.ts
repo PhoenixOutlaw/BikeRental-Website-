@@ -36,11 +36,11 @@ export class UserService {
     }
   }
 
-  async getuser(id: string,data:any) {
+  async getuser(id: string, data: any) {
     try {
       if (data.jwt.role === "regular" && id !== data.jwt.id) {
         throw new HttpException("FORBIDDEN", HttpStatus.FORBIDDEN);
-      }   
+      }
       const user = await this.userrepo.findOne({
         where: { id: id },
         relations: ["reservations.bike"],
@@ -56,8 +56,7 @@ export class UserService {
   async deleteuser(id: string) {
     try {
       const user = await this.userrepo.findOneBy({ id: id });
-      if (!user)
-        throw new HttpException("No user found", HttpStatus.NOT_FOUND);
+      if (!user) throw new HttpException("No user found", HttpStatus.NOT_FOUND);
       await this.userrepo.delete({ id: id });
       return "User Deleted";
     } catch (err) {
@@ -74,6 +73,11 @@ export class UserService {
     }
     try {
       const res = await this.userrepo.findOneBy({ id: id });
+      if (res.email !== data.data.email) {
+        const res = await this.userrepo.findOneBy({ email: data.data.email });
+        if (res)
+          throw new HttpException("Email Already Exists", HttpStatus.CONFLICT);
+      }
       if (!res)
         throw new HttpException("id does not exist", HttpStatus.NOT_FOUND);
       await this.userrepo

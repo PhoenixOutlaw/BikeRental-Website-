@@ -5,13 +5,18 @@ import { deleteuser, getalluser, updateuser } from "./apis/userapi";
 
 const initialState = {
   users: [],
+  currentuser: undefined,
   total:0
 };
 
 export const adminSlice = createSlice({
   name: "admin",
   initialState,
-  reducers: {},
+  reducers: {
+    setcurrentuser: (state,action) => {
+      state.currentuser = action.payload;
+    }
+  },
 
   extraReducers: (builder) => {
     builder
@@ -95,5 +100,5 @@ export const adminSlice = createSlice({
   },
 });
 
-export const {} = adminSlice.actions;
+export const {setcurrentuser} = adminSlice.actions;
 export default adminSlice.reducer;

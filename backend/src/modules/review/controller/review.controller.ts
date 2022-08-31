@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, HttpCode, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { Roles } from 'src/guards/role.guard';
 import { ReviewService } from '../services/review.service';
 
 @Controller('review')
@@ -15,12 +16,14 @@ export class ReviewController {
 
   @Delete("/:id")
   @HttpCode(200)
+  @Roles("admin")
   deletereview(@Param("id") id: string) {
     return this.service.deletereview(id)
   }
 
   @Patch("/:id")
   @HttpCode(200)
+  @Roles("admin")
   updatereview(@Param("id") id: string, @Body() data: any) {
     return this.service.updatereview(id,data)
   }

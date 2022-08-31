@@ -41,7 +41,6 @@ export class UserController {
   @UseGuards(RoleGuard)
   @Roles("admin")
   deleteuser(@Param("id") id: string) {
-    console.log(id)
     return this.services.deleteuser(id);
   }
   
@@ -49,7 +48,6 @@ export class UserController {
   @HttpCode(200)
   @UseGuards(RoleGuard)
   modifyuser(@Param("id") id: string, @Body() data: any) {
-    console.log(id)
     return this.services.updateuser(id, data);
   }
 }

@@ -1,13 +1,3 @@
 backend
 add dto validation  with jwt
 
-
-
-
-
-
-
-
-
-
-Rate an active reservation of his own with a Review ( comment, rating )

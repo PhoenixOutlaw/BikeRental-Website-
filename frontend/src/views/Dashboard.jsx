@@ -2,7 +2,11 @@ import { Form, Input, message, Modal, Pagination, Select } from "antd";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { deleteuser, getalluser, updateuser } from "../redux/features/admin/apis/userapi";
+import {
+  deleteuser,
+  getalluser,
+  updateuser,
+} from "../redux/features/admin/apis/userapi";
 import { validjwt } from "../utils/fnc";
 import validator from "validator";
 import {
@@ -11,6 +15,7 @@ import {
   PlusSquareOutlined,
 } from "@ant-design/icons";
 import { registeruser } from "../redux/features/login/loginAPI";
+import { setcurrentuser } from "../redux/features/admin/adminSlice";
 
 const inputs = [
   {
@@ -21,14 +26,15 @@ const inputs = [
     label: "LastName",
     name: "lastName",
   },
-];
-
-const inputcreate = [
-  ...inputs,
   {
     label: "Email",
     name: "email",
   },
+];
+
+const inputcreate = [
+  ...inputs,
+
   {
     label: "Password",
     name: "password",
@@ -46,8 +52,8 @@ const Dashboard = () => {
   const [updatevisible, setupdatevisible] = useState(false);
   const userid = useSelector((state) => state.login.user.id);
   const users = useSelector((state) => state.admin.users);
+  const currentuser = useSelector((state) => state.admin.currentuser);
   const total = useSelector((state) => state.admin.total);
-  const [currentuser, setcurrentuser] = useState();
   const [visible, setvisible] = useState(false);
   const [filter, setfilter] = useState("");
   const [limit, setlimit] = useState(10);
@@ -80,30 +86,34 @@ const Dashboard = () => {
       );
       return null;
     }
-    createform.resetFields(); 
-    dispatch(registeruser({ data: values}));
+    createform.resetFields();
+    dispatch(registeruser({ data: values }));
   };
 
   const updateform = (values) => {
+    if (!validator.isEmail(values.email)) {
+      message.error("Email invalid");
+      return null;
+    }
     const updatevalue = {
       id: currentuser.id,
       updates: {
-        firstName: values.firstName ? values.firstName : currentuser.firstName,
-        lastName: values.lastName ? values.lastName : currentuser.lastName,
-        role: values.role ? values.role : currentuser.role,
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        role: values.role,
       },
     };
     validjwt(() => dispatch(updateuser(updatevalue)));
-    console.log(updatevalue);
     form.resetFields();
+    dispatch(setcurrentuser(undefined));
     setupdatevisible(false);
-    setcurrentuser(undefined);
   };
 
   function close() {
     form.resetFields();
+    dispatch(setcurrentuser(undefined));
     setupdatevisible(false);
-    setcurrentuser(undefined);
   }
 
   const nav = useNavigate();
@@ -118,6 +128,10 @@ const Dashboard = () => {
       )
     );
   }, [filter]);
+
+  useEffect(() => {
+    form.setFieldsValue(currentuser);
+  }, [form, currentuser]);
 
   return (
     <div className="">
@@ -136,9 +150,6 @@ const Dashboard = () => {
             }}
             wrapperCol={{
               span: 16,
-            }}
-            initialValues={{
-              ...currentuser,
             }}
             onFinish={updateform}
             autoComplete="off"
@@ -167,7 +178,10 @@ const Dashboard = () => {
       <Modal
         title="create user"
         visible={visible}
-        onOk={()=>{createform.submit(); setvisible(false);}}
+        onOk={() => {
+          createform.submit();
+          setvisible(false);
+        }}
         onCancel={() => {
           setvisible(false);
           createform.resetFields();
@@ -203,12 +217,17 @@ const Dashboard = () => {
             </Form.Item>
           ))}
           <div className="d-flex justify-center full-width">
-            <Form.Item label="roles" name="role" style={{ width: "10rem" }}  rules={[
+            <Form.Item
+              label="roles"
+              name="role"
+              style={{ width: "10rem" }}
+              rules={[
                 {
                   required: true,
                   message: `Please input role!`,
                 },
-              ]}>
+              ]}
+            >
               <Select>
                 {options.map((i) => (
                   <Select.Option key={i} value={i}>
@@ -245,42 +264,46 @@ const Dashboard = () => {
       </div>
 
       {users?.length > 0 ? (
-        users?.map((user) => (user.id===userid)?null:(
-          <div
-            key={user.id}
-            className="d-flex box-shadow p p-s padding-lr-m padding-top-s padding-bottom-s justify-sb margin-bottom-s"
-          >
-            <div>
-              <p className="m0">Id : {user.id}</p>
-              <p className="m0">
-                Name : {user.firstName} {user.lastName}
-              </p>
-              <p className="m0">Email : {user.email}</p>
-              <p className="m0">Role : {user.role}</p>
+        users?.map((user) =>
+          user.id === userid ? null : (
+            <div
+              key={user.id}
+              className="d-flex box-shadow p p-s padding-lr-m padding-top-s padding-bottom-s justify-sb margin-bottom-s"
+            >
+              <div>
+                <p className="m0">Id : {user.id}</p>
+                <p className="m0">
+                  Name : {user.firstName} {user.lastName}
+                </p>
+                <p className="m0">Email : {user.email}</p>
+                <p className="m0">Role : {user.role}</p>
+              </div>
+              <div className="admin d-flex--c gutter-s padding-lr-s justify-right">
+                <EditOutlined
+                  className="btn btn-edit p-m"
+                  onClick={() => {
+                    dispatch(setcurrentuser(user));
+                    setupdatevisible(true);
+                  }}
+                />
+                <DeleteOutlined
+                  className="btn btn-delete p-m"
+                  onClick={() => {
+                    validjwt(() => dispatch(deleteuser(user.id)));
+                  }}
+                />
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    nav(`/user/${user.id}`);
+                  }}
+                >
+                  More details
+                </button>
+              </div>
             </div>
-            <div className="admin d-flex--c gutter-s padding-lr-s justify-right">
-              <EditOutlined
-                className="btn btn-edit p-m"
-                onClick={() => {
-                  setupdatevisible(true);
-                  setcurrentuser(user);
-                }}
-              />
-              <DeleteOutlined
-                className="btn btn-delete p-m"
-                onClick={() => {validjwt(()=>dispatch(deleteuser(user.id)))}}
-              />
-              <button
-                className="btn btn-secondary"
-                onClick={() => {
-                  nav(`/user/${user.id}`);
-                }}
-              >
-                More details
-              </button>
-            </div>
-          </div>
-        ))
+          )
+        )
       ) : (
         <h2 className="text-center p p-m"> no results found</h2>
       )}

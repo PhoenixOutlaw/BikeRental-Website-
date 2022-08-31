@@ -23,7 +23,7 @@ export class BikesService {
     }
   }
 
-  async getallbike(params: any) {
+  async getallbike(params: any, data: any) {
     try {
       const pagination = {
         page: params.page !== null ? 1 : parseInt(params.page),
@@ -120,7 +120,13 @@ export class BikesService {
         .offset(offset)
         .limit(pagination.limit)
         .getMany();
-      return { total, data: { available: available, unavailable: reserved } };
+      return {
+        total,
+        data: {
+          available: available,
+          unavailable: data.jwt === "admin" ? reserved : [],
+        },
+      };
     } catch (err) {
       throw new HttpException(err.message, err.status);
     }

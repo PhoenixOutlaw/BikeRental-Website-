@@ -277,7 +277,7 @@
 
 .overlay {
   position: absolute;
-  background: rgba(0, 0, 0, 0.827);
+  background: rgba(190, 179, 179, 0.827);
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
   min-width: 100%;

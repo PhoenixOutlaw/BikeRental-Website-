@@ -10,8 +10,8 @@ export class BikesController {
 
     @Get()
     @HttpCode(200)
-    getallbikes(@Query() params: any){
-        return this.service.getallbike(params);
+    getallbikes(@Query() params: any, @Body() data: any){
+        return this.service.getallbike(params,data);
     }
 
     @Get("/:id")
