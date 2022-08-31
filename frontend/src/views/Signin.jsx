@@ -1,13 +1,4 @@
-import {
-  Button,
-  Checkbox,
-  Form,
-  Input,
-  Typography,
-  Row,
-  Col,
-  message,
-} from "antd";
+import { Button, Checkbox, Form, Input, Typography, Row, message } from "antd";
 import validator from "validator";
 import React from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
@@ -58,14 +49,12 @@ export const Signin = ({ register }) => {
   return user ? (
     <Navigate to="/" />
   ) : (
-    <Row style={{ height: "100vh", alignContent: "center" }} justify="center">
+    <div
+      className="d-flex--c justify-center align-center"
+      style={{ height: "100vh" }}
+    >
       <Form
         name="basic"
-        style={{ height: "fit-content", width: "70%" }}
-        labelCol={{
-          span: 8,
-        }}
-        wrapperCol={{ span: 16 }}
         initialValues={{
           remember: true,
         }}
@@ -73,134 +62,97 @@ export const Signin = ({ register }) => {
         onFinishFailed={onFinishFailed}
         autoComplete="on"
       >
-        <Row span={18} justify="center">
-          <h1 className="text-center">{register ? "Register" : "login"}</h1>
-        </Row>
+        <h1 className="text-center">{register ? "Register" : "login"}</h1>
         {register && (
           <>
-            <Row span={18} justify="center">
-              <Form.Item
-                label="FirstName"
-                name="firstName"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your firstname!",
-                  },
-                ]}
-              >
-                <Input />
-              </Form.Item>
-            </Row>
-            <Row span={18} justify="center">
-              <Form.Item
-                label="LastName"
-                name="lastName"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your lastname!",
-                  },
-                ]}
-              >
-                <Input />
-              </Form.Item>
-            </Row>
+            <Form.Item
+              label="FirstName"
+              name="firstName"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input your firstname!",
+                },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              label="LastName"
+              name="lastName"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input your lastname!",
+                },
+              ]}
+            >
+              <Input />
+            </Form.Item>
           </>
         )}
-        <Row span={18} justify="center">
+        <Form.Item
+          label="Email"
+          name="email"
+          rules={[
+            {
+              required: true,
+              message: "Enter a valid email address!",
+            },
+          ]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label="Password"
+          name="password"
+          rules={[
+            {
+              required: true,
+              message: "Password too weak use A-z,a-z,0-9,(#,$,* etc)",
+            },
+          ]}
+        >
+          <Input.Password />
+        </Form.Item>
+
+        {register && (
           <Form.Item
-            label="Email"
-            name="email"
+            label="Confirm"
+            name="repassword"
             rules={[
               {
                 required: true,
-                message: "Enter a valid email address!",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-        </Row>
-        <Row span={18} justify="center">
-          <Form.Item
-            label="Password"
-            name="password"
-            rules={[
-              {
-                required: true,
-                message: "Password too weak use A-z,a-z,0-9,(#,$,* etc)",
+                message: "Please input your confirmation password!",
               },
             ]}
           >
             <Input.Password />
           </Form.Item>
-        </Row>
-
-        {register && (
-          <Row span={18} justify="center">
-            <Form.Item
-              label="Confirm"
-              name="repassword"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your confirmation password!",
-                },
-              ]}
-            >
-              <Input.Password />
-            </Form.Item>
-          </Row>
         )}
-        {
-          <Row span={24} gutter={4} justify="center">
-            <Col span={8}>
-              {!register && (
-                <Form.Item
-                  name="remember"
-                  valuePropName="checked"
-                  wrapperCol={{
-                    offset: 8,
-                    span: 16,
-                  }}
-                >
-                  <Checkbox>Remember me</Checkbox>
-                </Form.Item>
-              )}
-            </Col>
+        <div className="d-flex gutter-m">
+          {!register && (
+            <Form.Item name="remember" valuePropName="checked">
+              <Checkbox>Remember me</Checkbox>
+            </Form.Item>
+          )}
 
-            <Col span={12}>
-              <Form.Item
-                wrapperCol={{
-                  span: 16,
-                }}
-              >
-                <Typography>
-                  {register
-                    ? "already have an account"
-                    : "Dont have an account"}
-                  <Link to={register ? "/login" : "/register"}>
-                    {register ? " Login" : " Signup"}
-                  </Link>
-                </Typography>
-              </Form.Item>
-            </Col>
-          </Row>
-        }
-        <Row span={18} justify="center">
-          <Form.Item
-            wrapperCol={{
-              offset: 0,
-              span: 24,
-            }}
-          >
-            <Button type="primary" block htmlType="submit">
-              Submit
-            </Button>
+          <Form.Item>
+            <Typography>
+              {register ? "already have an account" : "Dont have an account"}
+              <Link to={register ? "/login" : "/register"}>
+                {register ? " Login" : " Signup"}
+              </Link>
+            </Typography>
           </Form.Item>
-        </Row>
+        </div>
+
+        <Form.Item>
+          <Button type="primary" block htmlType="submit">
+            Submit
+          </Button>
+        </Form.Item>
       </Form>
-    </Row>
+    </div>
   );
 };
