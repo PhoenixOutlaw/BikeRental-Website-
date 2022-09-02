@@ -1,12 +1,20 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { getallbikes } from "../redux/features/bikes/bikeAPI";
-import { Rate, Form, Input, Pagination, Select, Button, message } from "antd";
+import {
+  Rate,
+  Form,
+  Input,
+  Pagination,
+  Select,
+  Button,
+  message,
+  Slider,
+} from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import Modal from "antd/lib/modal/Modal";
 import { validjwt } from "../utils/fnc";
 import { DatePicker } from "antd";
-import "antd/dist/antd.css";
 import {
   addbike,
   deletebike,
@@ -19,52 +27,9 @@ import {
 } from "@ant-design/icons";
 import { useForm } from "antd/lib/form/Form";
 import moment from "moment";
-import { newfilter } from "../redux/features/bikes/bikeSlice";
+import { newfilter, resetfilter } from "../redux/features/bikes/bikeSlice";
 import { addreservation } from "../redux/features/reservation/reservationAPI";
 const { RangePicker } = DatePicker;
-
-const inputs = [
-  {
-    label: "Name",
-    name: "name",
-    rules: [
-      {
-        required: true,
-        message: "Please input your Bikes Name!",
-      },
-    ],
-  },
-  {
-    label: "Model",
-    name: "model",
-    rules: [
-      {
-        required: true,
-        message: "Please input your Bikes Model!",
-      },
-    ],
-  },
-  {
-    label: "Color",
-    name: "color",
-    rules: [
-      {
-        required: true,
-        message: "Please input your Bikes color!",
-      },
-    ],
-  },
-  {
-    label: "Location",
-    name: "location",
-    rules: [
-      {
-        required: true,
-        message: "Please input your Bikes Location!",
-      },
-    ],
-  },
-];
 
 export const Bikes = () => {
   const availablebikes = useSelector((state) => state.bike.availablebikes);
@@ -160,8 +125,8 @@ export const Bikes = () => {
                 <Bike key={bike.id} available={false} bike={bike} />
               ))}
           </div>
-          {availablebikes?.length > 0 ? (
-            availablebikes?.length > 0 && (
+          {availablebikes ? (
+            availablebikes?.length > 0 ? (
               <div className="d-flex justify-center padding-bottom-x padding-top-m">
                 <Pagination
                   total={total}
@@ -172,6 +137,13 @@ export const Bikes = () => {
                   onChange={(page) => nav(`/?page=${page}&limit=${limit}`)}
                 />
               </div>
+            ) : (
+              <h4
+                className=" heading text-center heading-s margin-bottom-m margin-top-s"
+                style={{ border: "1px solid" }}
+              >
+                no available bikes
+              </h4>
             )
           ) : (
             <>
@@ -248,7 +220,9 @@ const Bike = ({ bike, available }) => {
           {!available ? (
             <p className="p p-s text dot dot--red">reserved</p>
           ) : (
-            <p className="p p-s text d-flex align-center gutter-s dot dot--green">available</p>
+            <p className="p p-s text d-flex align-center gutter-s dot dot--green">
+              available
+            </p>
           )}
           <p className="p p-s text">name : {name}</p>
           <p className="p p-s text">model : {model}</p>
@@ -292,25 +266,24 @@ const Bike = ({ bike, available }) => {
 };
 
 const Filter = () => {
+  const sfilter = useSelector((state) => state.bike.filter);
+  const dateFormat = "YYYY-MM-DD HH:mm";
   const [dates, setdates] = useState();
   const [query] = useSearchParams();
   const dispatch = useDispatch();
-  const sfilter = useSelector((state) => state.bike.filter);
   const [form] = useForm();
-  const options = [0];
-  for (let i = 1; i <= 5; i += 0.5) {
-    options.push(i);
-  }
+
   const onChange = (values, dates) => {
     setdates(dates);
   };
+
   const onFinish = (values) => {
     let { from_to, ...filter } = values;
     dispatch(
       newfilter({
         ...filter,
-        from: moment(dates[0]).format("YYYY-MM-DD HH:mm:ss"),
-        to: moment(dates[1]).format("YYYY-MM-DD HH:mm:ss"),
+        from: moment(dates[0]).format(dateFormat),
+        to: moment(dates[1]).format(dateFormat),
       })
     );
     validjwt(() =>
@@ -334,7 +307,14 @@ const Filter = () => {
         name="basic"
         layout="vertical"
         initialValues={{
-          rating: 0,
+          from_to: sfilter
+            ? [moment(sfilter?.from), moment(sfilter?.to)]
+            : null,
+          name: sfilter?.name,
+          location: sfilter?.location,
+          model: sfilter?.model,
+          color: sfilter?.color,
+          rating: sfilter?.rating,
         }}
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
@@ -345,9 +325,10 @@ const Filter = () => {
             showTime={{
               format: "HH:mm",
             }}
+            allowClear={false}
             onChange={onChange}
             disabledDate={(current) => current.valueOf() < Date.now()}
-            format="YYYY-MM-DD HH:mm"
+            format={dateFormat}
           />
         </Form.Item>
         {inputs.map((input, i) => (
@@ -356,13 +337,7 @@ const Filter = () => {
           </Form.Item>
         ))}
         <Form.Item label="Rating" name="rating">
-          <Select>
-            {options.map((i) => (
-              <Select.Option key={i} value={i}>
-                {i}
-              </Select.Option>
-            ))}
-          </Select>
+          <Slider min={0} max={5} step={0.5} />
         </Form.Item>
         <div className=" d-flex gutter-s">
           <Form.Item>
@@ -375,8 +350,7 @@ const Filter = () => {
               type="primary"
               htmlType="reset"
               onClick={() => {
-                dispatch(newfilter({}));
-                validjwt(() => dispatch(getallbikes({})));
+                dispatch(resetfilter());
               }}
             >
               Reset
@@ -387,3 +361,46 @@ const Filter = () => {
     </div>
   );
 };
+
+const inputs = [
+  {
+    label: "Name",
+    name: "name",
+    rules: [
+      {
+        required: true,
+        message: "Please input your Bikes Name!",
+      },
+    ],
+  },
+  {
+    label: "Model",
+    name: "model",
+    rules: [
+      {
+        required: true,
+        message: "Please input your Bikes Model!",
+      },
+    ],
+  },
+  {
+    label: "Color",
+    name: "color",
+    rules: [
+      {
+        required: true,
+        message: "Please input your Bikes color!",
+      },
+    ],
+  },
+  {
+    label: "Location",
+    name: "location",
+    rules: [
+      {
+        required: true,
+        message: "Please input your Bikes Location!",
+      },
+    ],
+  },
+];

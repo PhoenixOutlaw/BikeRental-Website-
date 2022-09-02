@@ -1,17 +1,18 @@
-import React, { lazy, Suspense, useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-import "./App.css";
-import { Main } from "./views/Main";
-import { Signin } from "./views/Signin";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import Cookies from "js-cookie";
+import React, { lazy, Suspense, useState } from "react";
 import { getloggeduser } from "./redux/features/login/loginAPI";
+import { useDispatch, useSelector } from "react-redux";
 import { Bars } from "react-loader-spinner";
-import { validjwt } from "./utils/fnc";
-import { Auth } from "./components/Auth";
 import { Bikes } from "./components/Bikes";
+import { Auth } from "./components/Auth";
+import { Signin } from "./views/Signin";
+import { validjwt } from "./utils/fnc";
 import api from "./axios/axiosconfig";
+import { Main } from "./views/Main";
+import { useEffect } from "react";
+import Cookies from "js-cookie";
+import "antd/dist/antd.min.css";
+import "./App.css";
 
 const  Bike = lazy(()=> import("./components/Bike"));
 const  Dashboard = lazy(()=> import("./views/Dashboard"));
@@ -22,6 +23,7 @@ function App() {
   const status = useSelector((state) => state.login.status);
   const [loading, setloading] = useState(true);
   const dispatch = useDispatch();
+
   useEffect(() => {
     const token = Cookies.get("token");
     if(token) {

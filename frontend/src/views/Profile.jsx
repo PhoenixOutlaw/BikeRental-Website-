@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from "react";
+import { getuser, updateuser } from "../redux/features/admin/apis/userapi";
 import { DeleteOutlined, EditOutlined, UserOutlined } from "@ant-design/icons";
-import { useDispatch, useSelector } from "react-redux";
-import { Avatar, Form, Input, Modal, Select } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
+import { Avatar, Form, Input, message, Modal, Select } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { validjwt } from "../utils/fnc";
+import validator from "validator";
 import {
   deletereservation,
   updatereservation,
 } from "../redux/features/reservation/reservationAPI";
-import { validjwt } from "../utils/fnc";
-import { getuser, updateuser } from "../redux/features/admin/apis/userapi";
 
 const inputs = [
   {
@@ -18,6 +19,10 @@ const inputs = [
   {
     label: "LastName",
     name: "lastName",
+  },
+  {
+    label: "Email",
+    name: "email",
   },
 ];
 const options = ["regular", "admin"];
@@ -34,12 +39,17 @@ const Profile = () => {
     setupdatevisible(false);
   }
   const updateform = (values) => {
+    if (!validator.isEmail(values.email)) {
+      message.error("Email invalid");
+      return null;
+    }
     const updatevalue = {
       id: user.id,
       updates: {
         firstName: values.firstName,
         lastName: values.lastName,
-        role: values.role,
+        email: values.email,
+        // role: values.role,
       },
     };
     validjwt(() => dispatch(updateuser(updatevalue)));
@@ -89,7 +99,7 @@ const Profile = () => {
               <Input placeholder={user[Object.keys(user)[i + 1]]} />
             </Form.Item>
           ))}
-          <div className="d-flex justify-center full-width">
+          {/* <div className="d-flex justify-center full-width">
             <Form.Item label="roles" name="role" style={{ width: "10rem" }}>
               <Select placeholder={user?.role}>
                 {options.map((i) => (
@@ -99,13 +109,13 @@ const Profile = () => {
                 ))}
               </Select>
             </Form.Item>
-          </div>
+          </div> */}
         </Form>
       </Modal>
       <div className="profile d-flex--c align-center box-shadow padding-lr-m padding-bottom-m padding-top-m position-relative">
         <EditOutlined
           className="position-absolute btn-edit btn"
-          style={{ fontSize: "1rem", top: "5%", right: "10%" }}
+          style={{ fontSize: "1rem", top: "5%", right: "10%",color:"black" }}
           onClick={() => setupdatevisible(true)}
         />
         <div className="d-flex">
@@ -133,6 +143,7 @@ const Profile = () => {
           >
             <div>
               <p className="p p-s m0">name: {e.bike.name}</p>
+              <p className="p p-s m0">model: {e.bike.model}</p>
               {e.active ? (
                 <p className="p p-s text dot dot--green">active</p>
               ) : (

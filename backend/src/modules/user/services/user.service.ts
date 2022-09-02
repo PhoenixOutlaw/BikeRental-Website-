@@ -73,13 +73,13 @@ export class UserService {
     }
     try {
       const res = await this.userrepo.findOneBy({ id: id });
+      if (!res)
+        throw new HttpException("id does not exist", HttpStatus.NOT_FOUND);
       if (res.email !== data.data.email) {
         const res = await this.userrepo.findOneBy({ email: data.data.email });
         if (res)
           throw new HttpException("Email Already Exists", HttpStatus.CONFLICT);
       }
-      if (!res)
-        throw new HttpException("id does not exist", HttpStatus.NOT_FOUND);
       await this.userrepo
         .createQueryBuilder()
         .update()

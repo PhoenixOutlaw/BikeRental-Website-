@@ -1,21 +1,21 @@
 import { Form, Input, message, Modal, Pagination, Select } from "antd";
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { setcurrentuser } from "../redux/features/admin/adminSlice";
+import { registeruser } from "../redux/features/login/loginAPI";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { validjwt } from "../utils/fnc";
+import validator from "validator";
 import {
   deleteuser,
   getalluser,
   updateuser,
 } from "../redux/features/admin/apis/userapi";
-import { validjwt } from "../utils/fnc";
-import validator from "validator";
 import {
   DeleteOutlined,
   EditOutlined,
   PlusSquareOutlined,
 } from "@ant-design/icons";
-import { registeruser } from "../redux/features/login/loginAPI";
-import { setcurrentuser } from "../redux/features/admin/adminSlice";
 
 const inputs = [
   {
@@ -58,9 +58,9 @@ const Dashboard = () => {
   const [filter, setfilter] = useState("");
   const [limit, setlimit] = useState(10);
   const [createform] = Form.useForm();
+  const [form] = Form.useForm();
   const [query] = useSearchParams();
   const dispatch = useDispatch();
-  const [form] = Form.useForm();
   const { Search } = Input;
 
   const createuser = (values) => {

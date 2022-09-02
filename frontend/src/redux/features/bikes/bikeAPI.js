@@ -5,7 +5,7 @@ import { currentbike } from "./bikeSlice";
 export const getallbikes = createAsyncThunk(
   "bike/allbikes",
   async (payload, { rejectWithValue, getState }) => {
-    const filter = getState().bike.filter;
+    const filter = getState().bike?.filter;
     try {
       const query =
         (filter.name ? `&name=${filter.name}` : "") +

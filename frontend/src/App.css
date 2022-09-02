@@ -228,7 +228,7 @@
 }
 .btn-delete,
 .btn-edit {
-  color: white;
+  color: black;
   transition: all 0.3s !important;
 }
 .btn-delete:hover {

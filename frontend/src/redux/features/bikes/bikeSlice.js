@@ -3,9 +3,9 @@ import { message } from "antd";
 import { getallbikes, getbike } from "./bikeAPI";
 
 const initialState = {
-  availablebikes: [],
-  unavailablebikes: [],
-  filter:{},
+  availablebikes: undefined,
+  unavailablebikes: undefined,
+  filter:undefined,
   total: 0,
   currentbike:undefined,
   status: "idle",
@@ -20,6 +20,12 @@ export const bikeSlice = createSlice({
    },
    newfilter:(state,action)=>{
     state.filter = action.payload
+   },
+   resetfilter:(state)=>{
+    state.filter = undefined;
+    state.availablebikes = undefined;
+    state.unavailablebikes = undefined;
+    
    }
   },
 
@@ -55,6 +61,6 @@ export const bikeSlice = createSlice({
   },
 });
 
-export const { currentbike,newfilter } = bikeSlice.actions;
+export const { currentbike,newfilter,resetfilter } = bikeSlice.actions;
 export const selectCount = (state) => state.counter.value;
 export default bikeSlice.reducer;

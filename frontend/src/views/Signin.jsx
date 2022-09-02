@@ -1,8 +1,8 @@
 import { Button, Checkbox, Form, Input, Typography, Row, message } from "antd";
-import validator from "validator";
-import React from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import validator from "validator";
+import React from "react";
 import {
   login,
   register as registerapi,
@@ -130,7 +130,7 @@ export const Signin = ({ register }) => {
             <Input.Password />
           </Form.Item>
         )}
-        <div className="d-flex gutter-m">
+        <div className="d-flex gutter-m justify-center p">
           {!register && (
             <Form.Item name="remember" valuePropName="checked">
               <Checkbox>Remember me</Checkbox>

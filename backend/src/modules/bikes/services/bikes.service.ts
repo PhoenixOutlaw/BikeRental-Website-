@@ -124,7 +124,7 @@ export class BikesService {
         total,
         data: {
           available: available,
-          unavailable: data.jwt === "admin" ? reserved : [],
+          unavailable: data.jwt.role === "admin" ? reserved : [],
         },
       };
     } catch (err) {
