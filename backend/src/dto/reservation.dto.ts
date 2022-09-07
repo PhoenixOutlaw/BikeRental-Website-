@@ -1,6 +1,14 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty } from "class-validator";
 
 export class Create_reservationdto{
     @IsNotEmpty()
-    duration: number;
+    from: Date;
+    
+    @IsNotEmpty()
+    to: Date;
+}
+
+export class Update_reservationdto{
+    @IsNotEmpty()
+    active: boolean;
 }

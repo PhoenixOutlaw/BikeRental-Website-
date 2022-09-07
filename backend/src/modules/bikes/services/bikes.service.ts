@@ -25,91 +25,35 @@ export class BikesService {
 
   async getallbike(params: any, data: any) {
     try {
+      const { from, to, page, limit, ...filter } = params;
       const pagination = {
-        page: params.page !== null ? 1 : parseInt(params.page),
-        limit: params.limit !== null ? 10 : parseInt(params.limit),
+        page: page !== null ? 1 : parseInt(page),
+        limit: limit !== null ? 10 : parseInt(limit),
       };
       const offset = (pagination.page - 1) * pagination.limit;
-      const total = await this.bikerepo.createQueryBuilder().getCount();
-      if (!params.from && !params.to) {
-        return { data: { available: [], unavailable: [] } };
-      }
-
-      const filterquery = this.bikerepo
+      const reserved = await this.bikerepo
         .createQueryBuilder("bike")
         .leftJoinAndSelect("bike.reservations", "reservation")
-        .andWhere(
-          new Brackets((qb) => {
-            if (params.rating)
-              qb.andWhere("bike.avgrating >= :rating", {
-                rating: parseInt(params.rating),
-              });
-            if (params.name) {
-              qb.andWhere("bike.name like :name", {
-                name: `%${params.name}%`,
-              });
-            }
-            if (params.model)
-              qb.andWhere("bike.model like :model", {
-                model: `%${params.model}%`,
-              });
-            if (params.color)
-              qb.andWhere("color like :color", {
-                color: `${params.color}`,
-              });
-            if (params.location)
-              qb.andWhere("bike.location like :location", {
-                location: `%${params.location}%`,
-              });
-          })
-        );
-      const reserved = await filterquery
+        .where({ ...filter })
         .andWhere(
           new Brackets((qb) => {
             qb.orWhere("reservation.from BETWEEN :from and :to ", {
-              from: params.from,
-              to: params.to,
+              from: from,
+              to: to,
             })
               .orWhere("reservation.to BETWEEN :from and :to", {
-                from: params.from,
-                to: params.to,
+                from: from,
+                to: to,
               })
               .orWhere("reservation.from < :from and reservation.to >:to", {
-                from: params.from,
-                to: params.to,
+                from: from,
+                to: to,
               });
           })
         )
         .getMany();
 
-      let query = this.bikerepo
-        .createQueryBuilder("bike")
-        .where("")
-        .andWhere(
-          new Brackets((qb) => {
-            if (params.rating)
-              qb.andWhere("bike.avgrating >= :rating", {
-                rating: parseInt(params.rating),
-              });
-            if (params.name) {
-              qb.andWhere("bike.name like :name", {
-                name: `%${params.name}%`,
-              });
-            }
-            if (params.model)
-              qb.andWhere("bike.model like :model", {
-                model: `%${params.model}%`,
-              });
-            if (params.color)
-              qb.andWhere("color like :color", {
-                color: `${params.color}`,
-              });
-            if (params.location)
-              qb.andWhere("bike.location like :location", {
-                location: `%${params.location}%`,
-              });
-          })
-        );
+      let query = this.bikerepo.createQueryBuilder("bike").where({ ...filter });
       if (reserved.length) {
         query = query.andWhere("bike.id NOT IN (:reserved)", {
           reserved: reserved.map((e) => e.id),
@@ -119,9 +63,9 @@ export class BikesService {
       const available = await query
         .offset(offset)
         .limit(pagination.limit)
-        .getMany();
+        .getManyAndCount();
       return {
-        total,
+        total: 10,
         data: {
           available: available,
           unavailable: data.jwt.role === "admin" ? reserved : [],

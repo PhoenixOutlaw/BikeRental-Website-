@@ -7,7 +7,7 @@ import { Repository } from "typeorm";
 export class ReservationService {
   constructor(
     @InjectRepository(Reservation)
-    private readonly reservationrepo: Repository<Reservation>,
+    private readonly reservationrepo: Repository<Reservation>
   ) {}
 
   async getreservation(id: string) {
@@ -27,25 +27,29 @@ export class ReservationService {
 
   async makereservation(id: string, data: any) {
     try {
-    
-      const reserved =  await this.reservationrepo
-      .createQueryBuilder('reservation')
-      .where("reservation.bikeId = :id and ((reservation.from BETWEEN :from and :to  or reservation.to BETWEEN :from and :to) or (reservation.from <:from and reservation.to >:to))", { from: data.data.from,to: data.data.to,id: id })
-      // .andWhere("reservation.from BETWEEN :from and :to  or reservation.to BETWEEN :from and :to", { from: data.data.from,to: data.data.to})
-      // .orWhere("(reservation.from <:from and reservation.to >:to)", { from: data.data.from ,  to: data.data.to})                                   ask??
-      .getOne();  
-      if(reserved){
-        throw new HttpException('Bike Already reserved for the given reservation', HttpStatus.CONFLICT)
+      const reserved = await this.reservationrepo
+        .createQueryBuilder("reservation")
+        .where(
+          "reservation.bikeId = :id and ((reservation.from BETWEEN :from and :to  or reservation.to BETWEEN :from and :to) or (reservation.from <:from and reservation.to >:to))",
+          { from: data.data.from, to: data.data.to, id: id }
+        )
+        // .andWhere("reservation.from BETWEEN :from and :to  or reservation.to BETWEEN :from and :to", { from: data.data.from,to: data.data.to})
+        // .orWhere("(reservation.from <:from and reservation.to >:to)", { from: data.data.from ,  to: data.data.to})                                   ask??
+        .getOne();
+      if (reserved) {
+        throw new HttpException(
+          "Bike Already reserved for the given reservation",
+          HttpStatus.CONFLICT
+        );
       }
       const new_reservation = this.reservationrepo.create({
         ...data.data,
-        bike: id, 
+        bike: id,
         user: data.jwt.id,
       });
       const res = await this.reservationrepo.save(new_reservation);
       return res;
     } catch (err) {
-      console.log(err)
       throw new HttpException(err.message, HttpStatus.NOT_FOUND);
     }
   }
@@ -64,14 +68,21 @@ export class ReservationService {
 
   async updatereservation(id: string, data: any) {
     try {
-      console.log(data)
-      const exist = await this.reservationrepo.findBy({ id: id });
-      if (!exist.length)
+      const exist = await this.reservationrepo.findOne({
+        where: { id: id },
+        relations: ["user"],
+      });
+      if (data.jwt.id !== exist.user.id)
+        throw new HttpException(
+          "Only the owner of the reservation can perform this action",
+          HttpStatus.FORBIDDEN
+        );
+      if (!exist)
         throw new HttpException("no reservation found", HttpStatus.NOT_FOUND);
       await this.reservationrepo
         .createQueryBuilder()
         .update()
-        .set({ ...data })
+        .set({ active: data.data.active })
         .where({ id: id })
         .execute();
       return "Reservation Updated";

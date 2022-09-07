@@ -71,11 +71,13 @@ export class UserService {
     if (data.jwt.role === "regular" && data.data.role) {
       delete data.data.role;
     }
+    if(data.data.email)
+    data.data.email = data.data.email.toLowerCase();
     try {
       const res = await this.userrepo.findOneBy({ id: id });
       if (!res)
         throw new HttpException("id does not exist", HttpStatus.NOT_FOUND);
-      if (res.email !== data.data.email) {
+      if (data.data.email && res.email !== data.data.email) {
         const res = await this.userrepo.findOneBy({ email: data.data.email });
         if (res)
           throw new HttpException("Email Already Exists", HttpStatus.CONFLICT);

@@ -18,6 +18,7 @@ export class AuthService {
     const hashpassword = await bcrypt.hash(data.password, 10);
     const user = this.user.create({
       ...data,
+      email: data.email.toLowerCase(),
       role: data.role ? data.role : "regular",
       password: hashpassword,
     });
