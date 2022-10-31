@@ -1,5 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
+import 'dotenv/config'
 import * as jwt from "jsonwebtoken";
 
 import { Observable } from "rxjs";
