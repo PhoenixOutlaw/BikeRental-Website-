@@ -1,22 +1,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../../axios/axiosconfig";
 import { validjwt } from "../../../utils/fnc";
-import { getallbikes, getbike } from "../bikes/bikeAPI";
-import { reservation } from "../login/loginSlice";
+import { getallbikes } from "../bikes/bikeAPI";
 
-export const getreservation = createAsyncThunk(
-  "reservation/get",
-  async (payload, { rejectWithValue, getState, dispatch }) => {
-    try {
-      const id = getState().login.user.id;
-      const res = (await api.get(`/reservation/${id}`)).data;
-      dispatch(reservation(res));
-      return null;
-    } catch (err) {
-      return rejectWithValue(err.response.data);
-    }
-  }
-);
+
 
 export const addreservation = createAsyncThunk(
   "reservation/add",
@@ -44,9 +31,11 @@ export const updatereservation = createAsyncThunk(
       const res = (
         await api.patch(`/reservation/${payload.id}`, payload.updates)
       ).data;
+      if(payload.success) {
+        payload.success()
+      }
       return res;
     } catch (err) {
-      console.log(err)
       return rejectWithValue(err.response.data);
     }
   }
@@ -57,15 +46,14 @@ export const deletereservation = createAsyncThunk(
   async (payload, { rejectWithValue, dispatch, getState }) => {
     try {
       const res = (await api.delete(`/reservation/${payload.id}`)).data;
-      if (payload.type === "admin") {
-        dispatch(getbike(getState().bike.currentbike.id));
-        return null;
+
+      if(payload.success) {
+        payload.success()
       }
-      validjwt(() => dispatch(getreservation({})));
       validjwt(() => dispatch(getallbikes({})));
       return res;
     } catch (err) {
-      console.log(err);
+      console.log(err)
       return rejectWithValue(err.response.data);
     }
   }

@@ -14,6 +14,9 @@ import {
 import { AuthGuard } from "src/guards/auth.guard";
 import { RoleGuard, Roles } from "src/guards/role.guard";
 import { UserService } from "../services/user.service";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { multerOptions } from "./multerconfig";
+import * as jwt from "jsonwebtoken";
 
 @Controller("user")
 @UseGuards(AuthGuard)

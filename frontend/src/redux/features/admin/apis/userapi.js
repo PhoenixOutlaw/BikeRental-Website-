@@ -11,7 +11,7 @@ export const getalluser = createAsyncThunk(
           `/user?page=${payload.page}&limit=${payload.limit}${query}`
         )
       ).data;
-      return res;
+      return res; 
     } catch (err) {
       return rejectWithValue(err.response.data);
     }
@@ -23,9 +23,12 @@ export const updateuser = createAsyncThunk(
   async (payload, { rejectWithValue, dispatch, getState }) => {
     const role = getState().login.user.role;
     try {
-      const res = (await api.patch(`/user/${payload.id}`, payload.updates))
+      const res = (await api.patch(`/user/${payload.id}`, payload.updates,{
+        headers: { "Content-Type": "multipart/form-data" },
+      }))
         .data;
       if (role === "admin") dispatch(getalluser({}));
+      if (payload.success) payload.success();
       return res;
     } catch (err) {
       return rejectWithValue(err.response.data);

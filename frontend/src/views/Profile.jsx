@@ -1,15 +1,21 @@
 import { getuser, updateuser } from "../redux/features/admin/apis/userapi";
-import { DeleteOutlined, EditOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  UploadOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
-import { Avatar, Form, Input, message, Modal, Select } from "antd";
+import { Avatar, Button, Form, Input, message, Modal, Upload } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import React, { useEffect, useState } from "react";
-import { validjwt } from "../utils/fnc";
+import { noupdates, trimspace, validjwt } from "../utils/fnc";
 import validator from "validator";
 import {
   deletereservation,
   updatereservation,
 } from "../redux/features/reservation/reservationAPI";
+import { updateuserinfo } from "../redux/features/login/loginSlice";
 
 const inputs = [
   {
@@ -25,7 +31,7 @@ const inputs = [
     name: "email",
   },
 ];
-const options = ["regular", "admin"];
+// const options = ["regular", "admin"];
 
 const Profile = () => {
   const storeduser = useSelector((state) => state.login.user);
@@ -33,6 +39,7 @@ const Profile = () => {
   const [user, setuser] = useState(storeduser);
   const [updatevisible, setupdatevisible] = useState(false);
   const [form] = Form.useForm();
+  const [file, setfile] = useState(null);
   const nav = useNavigate();
   function close() {
     form.resetFields();
@@ -49,11 +56,31 @@ const Profile = () => {
         firstName: values.firstName,
         lastName: values.lastName,
         email: values.email,
+        image: file,
         // role: values.role,
       },
     };
-    validjwt(() => dispatch(updateuser(updatevalue)));
+    validjwt(() =>
+      dispatch(
+        updateuser({
+          ...updatevalue,
+          success: () =>
+            validjwt(() =>
+              dispatch(
+                getuser({
+                  id: id ? id : user.id,
+                  success: (data) => {
+                    setuser(data);
+                    dispatch(updateuserinfo(data));
+                  },
+                })
+              )
+            ),
+        })
+      )
+    );
     form.resetFields();
+    setfile(null)
     setupdatevisible(false);
   };
 
@@ -68,25 +95,25 @@ const Profile = () => {
         getuser({ id: id ? id : user.id, success: (data) => setuser(data) })
       )
     );
-  }, []);
+  }, [id, dispatch, user.id]);
+
+  useEffect(() => {
+    if (form.__INTERNAL__.name) form.setFieldsValue(user);
+  }, [form, user]);
+ 
 
   return (
     <div className="d-flex justify-center gutter-m margin-top-s">
       <Modal
         title="update user"
         visible={updatevisible}
-        onOk={form.submit}
+        onOk={() => noupdates(user, form)}
+        // onOk={() => form.submit()}
         onCancel={close}
       >
         <Form
           form={form}
           name="basic"
-          labelCol={{
-            span: 6,
-          }}
-          wrapperCol={{
-            span: 16,
-          }}
           initialValues={{
             ...user,
           }}
@@ -94,8 +121,39 @@ const Profile = () => {
           onFinishFailed={onFinishFailed}
           autoComplete="off"
         >
+          <Form.Item label="profile image">
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setfile(e.target.files[0])}
+            />
+            {/* <Upload
+              listType="picture"
+              
+              customRequest={({file,onSuccess})=>{
+                setTimeout(() => {
+                  onSuccess("ok");
+                }, 0);
+              }}
+            >
+              <Button icon={<UploadOutlined />}>Upload</Button>
+            </Upload> */}
+          </Form.Item>
           {inputs.map((input, i) => (
-            <Form.Item key={i} label={input.label} name={input.name}>
+            <Form.Item
+              key={i}
+              label={input.label}
+              name={input.name}
+              normalize={trimspace}
+              rules={[
+                {
+                  validator: (_, value) =>
+                    value.length
+                      ? Promise.resolve()
+                      : Promise.reject(message.error("No spaces allowed")),
+                },
+              ]}
+            >
               <Input placeholder={user[Object.keys(user)[i + 1]]} />
             </Form.Item>
           ))}
@@ -115,15 +173,20 @@ const Profile = () => {
       <div className="profile d-flex--c align-center box-shadow padding-lr-m padding-bottom-m padding-top-m position-relative">
         <EditOutlined
           className="position-absolute btn-edit btn"
-          style={{ fontSize: "1rem", top: "5%", right: "10%",color:"black" }}
+          style={{ fontSize: "1rem", top: "5%", right: "10%", color: "black" }}
           onClick={() => setupdatevisible(true)}
         />
         <div className="d-flex">
-          <Avatar size={120} shape="square" icon={<UserOutlined />} />
+          <Avatar
+            size={120}
+            shape="square"
+            src={user?.image ? `http://localhost:5000/${user?.image}` : null}
+            icon={<UserOutlined />}
+          />
         </div>
         <div className="p p-s margin-top-s">
           {Object.keys(user).map((fields) =>
-            fields !== "reservations" ? (
+            !["reservations", "image"].includes(fields) ? (
               <p key={fields}>
                 {fields}: {user[fields]}
               </p>
@@ -156,7 +219,7 @@ const Profile = () => {
                 to: {e.to}
               </p>
               <div className="d-flex gutter-s">
-                {e.active && (
+                {e.active && storeduser.id === user.id && (
                   <button
                     className="btn btn-secondary margin-top-s "
                     onClick={() =>
@@ -165,6 +228,15 @@ const Profile = () => {
                           updatereservation({
                             id: e.id,
                             updates: { active: false },
+                            success: () =>
+                              validjwt(() =>
+                                dispatch(
+                                  getuser({
+                                    id: id ? id : user.id,
+                                    success: (data) => setuser(data),
+                                  })
+                                )
+                              ),
                           })
                         )
                       )
@@ -181,18 +253,32 @@ const Profile = () => {
                 </button>
               </div>
             </div>
-            <div>
-              <DeleteOutlined
-                style={{ fontSize: "1rem" }}
-                className="btn btn-delete"
-                onClick={() =>
-                  e.id &&
-                  validjwt(() =>
-                    dispatch(deletereservation({ id: e.id, type: "user" }))
-                  )
-                }
-              />
-            </div>
+            {storeduser.id === user.id && (
+              <div>
+                <DeleteOutlined
+                  style={{ fontSize: "1rem" }}
+                  className="btn btn-delete"
+                  onClick={() =>
+                    validjwt(() =>
+                      dispatch(
+                        deletereservation({
+                          id: e.id,
+                          success: () =>
+                            validjwt(() =>
+                              dispatch(
+                                getuser({
+                                  id: id ? id : user.id,
+                                  success: (data) => setuser(data),
+                                })
+                              )
+                            ),
+                        })
+                      )
+                    )
+                  }
+                />
+              </div>
+            )}
           </div>
         ))}
       </div>

@@ -37,7 +37,7 @@ export const bikeSlice = createSlice({
       .addCase(getallbikes.fulfilled, (state, action) => {
         state.status = "idle";
         if(action.payload.data?.available)
-        state.availablebikes = action.payload.data.available;
+        state.availablebikes = action.payload.data.available[0];
         if(action.payload.data?.unavailable)
         state.unavailablebikes = action.payload.data.unavailable;
         state.total = action.payload.total;

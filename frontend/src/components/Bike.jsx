@@ -10,12 +10,12 @@ import { validjwt } from "../utils/fnc";
 import { message, Modal, Rate } from "antd";
 import { addreview, deletereview } from "../redux/features/review/reviewAPI";
 import { updatereview as update } from "../redux/features/review/reviewAPI";
-import { deletereservation } from "../redux/features/reservation/reservationAPI";
+// import { deletereservation } from "../redux/features/reservation/reservationAPI";
 
 const Bike = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const role = useSelector((state) => state.login.user.role);
+  // const role = useSelector((state) => state.login.user.role);
   const bike = useSelector((state) => state.bike.currentbike);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [updatereview, setupdatereview] = useState({
@@ -96,7 +96,7 @@ const Bike = () => {
                     <p className="nowrap">to : {reservation.to}</p>
                   </div>
                 </div>
-                {role === "admin" && (
+                {/* {role === "admin" && (
                   <div className="admin d-flex gutter-s padding-lr-s justify-right">
                     <DeleteOutlined
                       className="btn btn-delete p-m"
@@ -112,7 +112,7 @@ const Bike = () => {
                       }}
                     />
                   </div>
-                )}
+                )} */}
               </div>
             ))}
           </div>

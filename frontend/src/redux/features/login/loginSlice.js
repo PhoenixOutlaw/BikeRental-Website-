@@ -1,8 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { message } from "antd";
-import axios from "axios";
 import Cookies from "js-cookie";
-import api from "../../../axios/axiosconfig";
 import { getloggeduser, login, register, registeruser } from "./loginAPI";
 
 const initialState = {
@@ -17,6 +15,9 @@ export const loginSlice = createSlice({
   name: "login",
   initialState,
   reducers: {
+    updateuserinfo:(state,action)=>{
+      state.user= action.payload
+    },
     reservation:(state, action)=>{
       state.reservations= action.payload
     },
@@ -90,6 +91,6 @@ export const loginSlice = createSlice({
   },
 });
 
-export const { signin, signout,reservation } = loginSlice.actions;
+export const { signin, signout,reservation,updateuserinfo } = loginSlice.actions;
 export const selectCount = (state) => state.counter.value;
 export default loginSlice.reducer;

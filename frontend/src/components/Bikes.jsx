@@ -1,19 +1,10 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { getallbikes } from "../redux/features/bikes/bikeAPI";
-import {
-  Rate,
-  Form,
-  Input,
-  Pagination,
-  Select,
-  Button,
-  message,
-  Slider,
-} from "antd";
+import { Rate, Form, Input, Pagination, Button, message, Slider } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import Modal from "antd/lib/modal/Modal";
-import { validjwt } from "../utils/fnc";
+import { noupdates, trimspace, validjwt } from "../utils/fnc";
 import { DatePicker } from "antd";
 import {
   addbike,
@@ -51,18 +42,19 @@ export const Bikes = () => {
   const onFinishFailed = (errorInfo) => {
     message.error("Failed:");
   };
+  function submit() {
+    form.getFieldValue().length === inputs.length
+      ? form.submit()
+      : message.error("all fields are required");
+  }
   function close() {
     form.resetFields();
     setvisible(false);
   }
+
   return (
     <div className="position-relative padding-bottom-m">
-      <Modal
-        title="Add Bike"
-        visible={visible}
-        onOk={form.submit}
-        onCancel={close}
-      >
+      <Modal title="Add Bike" visible={visible} onOk={submit} onCancel={close}>
         <Form
           form={form}
           name="basic"
@@ -71,9 +63,6 @@ export const Bikes = () => {
           }}
           wrapperCol={{
             span: 16,
-          }}
-          initialValues={{
-            remember: true,
           }}
           onFinish={addform}
           onFinishFailed={onFinishFailed}
@@ -85,6 +74,7 @@ export const Bikes = () => {
               label={input.label}
               name={input.name}
               rules={input.rules}
+              normalize={trimspace}
             >
               <Input />
             </Form.Item>
@@ -120,7 +110,7 @@ export const Bikes = () => {
                 <Bike key={bike.id} available={true} bike={bike} />
               ))}
             {unavailablebikes?.length > 0 &&
-              role === "admin" &&
+              ["admin","manager"].includes(role) &&
               unavailablebikes.map((bike) => (
                 <Bike key={bike.id} available={false} bike={bike} />
               ))}
@@ -192,7 +182,17 @@ const Bike = ({ bike, available }) => {
       <Modal
         title="update Bike"
         visible={updatevisible}
-        onOk={updform.submit}
+        onOk={() =>
+          noupdates(
+            {
+              name: bike.name,
+              color: bike.color,
+              model: bike.model,
+              location: bike.location,
+            },
+            updform
+          )
+        }
         onCancel={close}
       >
         <Form
@@ -209,7 +209,20 @@ const Bike = ({ bike, available }) => {
           autoComplete="off"
         >
           {inputs.map((input, i) => (
-            <Form.Item key={i} label={input.label} name={input.name}>
+            <Form.Item
+              key={i}
+              label={input.label}
+              name={input.name}
+              normalize={trimspace}
+              rules={[
+                {
+                  validator: (_, value) =>
+                    value.length
+                      ? Promise.resolve()
+                      : Promise.reject(message.error("No spaces allowed")),
+                },
+              ]}
+            >
               <Input />
             </Form.Item>
           ))}
@@ -332,7 +345,12 @@ const Filter = () => {
           />
         </Form.Item>
         {inputs.map((input, i) => (
-          <Form.Item key={i} label={input.label} name={input.name}>
+          <Form.Item
+            key={i}
+            label={input.label}
+            name={input.name}
+            normalize={trimspace}
+          >
             <Input />
           </Form.Item>
         ))}

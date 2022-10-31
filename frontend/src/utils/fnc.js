@@ -3,6 +3,7 @@ import Cookies from "js-cookie";
 import jwt_decode from "jwt-decode";
 import { signout } from "../redux/features/login/loginSlice";
 import { store } from "../redux/store";
+import _ from "lodash";
 
 export function validjwt(fnc) {
   const token = Cookies.get("token");
@@ -29,3 +30,11 @@ export function compare(a, b) {
   }
   return 0;
 }
+
+export function noupdates(obj1,ref){
+  console.log(obj1,ref.getFieldValue)
+  _.isEqual(obj1, ref.getFieldValue())
+  ? message.error("No updates in field")
+  : ref.submit();
+}
+export const trimspace = (value, prevVal, prevVals) => value.trim();

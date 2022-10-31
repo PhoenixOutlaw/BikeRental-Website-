@@ -4,7 +4,7 @@ import { registeruser } from "../redux/features/login/loginAPI";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import React, { useEffect, useState } from "react";
-import { validjwt } from "../utils/fnc";
+import { noupdates, trimspace, validjwt } from "../utils/fnc";
 import validator from "validator";
 import {
   deleteuser,
@@ -44,7 +44,7 @@ const inputcreate = [
     name: "repassword",
   },
 ];
-const options = ["regular", "admin"];
+const options = ["regular", "admin","manager"];
 
 const Dashboard = () => {
   const role = useSelector((state) => state.login.user.role);
@@ -127,10 +127,10 @@ const Dashboard = () => {
         })
       )
     );
-  }, [filter]);
+  }, [filter, dispatch, query]);
 
   useEffect(() => {
-    form.setFieldsValue(currentuser);
+    if (form.__INTERNAL__.name) form.setFieldsValue(currentuser);
   }, [form, currentuser]);
 
   return (
@@ -139,7 +139,7 @@ const Dashboard = () => {
         <Modal
           title="update user"
           visible={updatevisible}
-          onOk={form.submit}
+          onOk={() => noupdates(currentuser, form)}
           onCancel={close}
         >
           <Form
@@ -155,7 +155,20 @@ const Dashboard = () => {
             autoComplete="off"
           >
             {inputs.map((input, i) => (
-              <Form.Item key={i} label={input.label} name={input.name}>
+              <Form.Item
+                key={i}
+                label={input.label}
+                name={input.name}
+                normalize={trimspace}
+                rules={[
+                  {
+                    validator: (_, value) =>
+                      value.length
+                        ? Promise.resolve()
+                        : Promise.reject(message.error("No spaces allowed")),
+                  },
+                ]}
+              >
                 <Input />
               </Form.Item>
             ))}
@@ -179,6 +192,10 @@ const Dashboard = () => {
         title="create user"
         visible={visible}
         onOk={() => {
+          if (createform.getFieldValue.length !== inputcreate.length) {
+            message.error("all fields are required");
+            return null;
+          }
           createform.submit();
           setvisible(false);
         }}
@@ -196,7 +213,6 @@ const Dashboard = () => {
           wrapperCol={{
             span: 16,
           }}
-          initialValues={{}}
           onFinish={createuser}
           // onFinishFailed={onFinishFailed}
           autoComplete="off"
@@ -206,6 +222,7 @@ const Dashboard = () => {
               key={i}
               label={input.label}
               name={input.name}
+              normalize={trimspace}
               rules={[
                 {
                   required: true,

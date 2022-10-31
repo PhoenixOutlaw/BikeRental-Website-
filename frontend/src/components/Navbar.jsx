@@ -51,7 +51,7 @@ export const Navbar = () => {
       </div>
       <Dropdown overlay={menu}>
         <Space>
-          <Avatar size={45} icon={<UserOutlined />} />
+          <Avatar size={45} src={user?.image?`http://localhost:5000/${user?.image}`:null} icon={<UserOutlined />} />
         </Space>
       </Dropdown>
     </div>

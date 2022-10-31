@@ -1,4 +1,4 @@
-import { Button, Checkbox, Form, Input, Typography, Row, message } from "antd";
+import { Button, Checkbox, Form, Input, Typography, message } from "antd";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import validator from "validator";
@@ -7,6 +7,7 @@ import {
   login,
   register as registerapi,
 } from "../redux/features/login/loginAPI";
+import { trimspace } from "../utils/fnc";
 
 export const Signin = ({ register }) => {
   const user = useSelector((state) => state.login.user);
@@ -68,6 +69,7 @@ export const Signin = ({ register }) => {
             <Form.Item
               label="FirstName"
               name="firstName"
+              normalize={trimspace}
               rules={[
                 {
                   required: true,
@@ -80,6 +82,7 @@ export const Signin = ({ register }) => {
             <Form.Item
               label="LastName"
               name="lastName"
+              normalize={trimspace}
               rules={[
                 {
                   required: true,
@@ -94,6 +97,7 @@ export const Signin = ({ register }) => {
         <Form.Item
           label="Email"
           name="email"
+          normalize={trimspace}
           rules={[
             {
               required: true,
@@ -106,6 +110,7 @@ export const Signin = ({ register }) => {
         <Form.Item
           label="Password"
           name="password"
+          normalize={trimspace}
           rules={[
             {
               required: true,
@@ -120,6 +125,7 @@ export const Signin = ({ register }) => {
           <Form.Item
             label="Confirm"
             name="repassword"
+            normalize={trimspace}
             rules={[
               {
                 required: true,
