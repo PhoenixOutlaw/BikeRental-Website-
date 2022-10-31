@@ -107,8 +107,8 @@ const Profile = () => {
       <Modal
         title="update user"
         visible={updatevisible}
-        onOk={() => noupdates(user, form)}
-        // onOk={() => form.submit()}
+        // onOk={() => noupdates(user, form)}
+        onOk={() => form.submit()}
         onCancel={close}
       >
         <Form

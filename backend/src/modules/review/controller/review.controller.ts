@@ -18,14 +18,14 @@ export class ReviewController {
 
   @Delete("/:id")
   @HttpCode(200)
-  @Roles("admin")
+  @Roles(["admin"])
   deletereview(@Param("id") id: string) {
     return this.service.deletereview(id)
   }
 
   @Patch("/:id")
   @HttpCode(200)
-  @Roles("admin")
+  @Roles(["admin"])
   updatereview(@Param("id") id: string, @Body() data: {data:Update_reviewdto, jwt:jwtDto}) {
     return this.service.updatereview(id,data)
   }

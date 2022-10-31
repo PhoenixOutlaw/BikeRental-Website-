@@ -36,14 +36,14 @@ export class BikesController {
 
   @Post()
   @HttpCode(200)
-  @Roles("admin")
+  @Roles(["admin"])
   @UseGuards(RoleGuard)
   create(@Body() data: { data: Create_Bikedto, jwt: jwtDto }) {
     return this.service.createnew(data.data);
   }
   @Patch("/:id")
   @HttpCode(200)
-  @Roles("admin")
+  @Roles(["admin"])
   @UseGuards(RoleGuard)
   update(
     @Param("id") id: string,
@@ -53,7 +53,7 @@ export class BikesController {
   }
   @Delete("/:id")
   @HttpCode(200)
-  @Roles("admin")
+  @Roles(["admin"])
   @UseGuards(RoleGuard)
   delete(@Param("id") id: string) {
     return this.service.delete(id);

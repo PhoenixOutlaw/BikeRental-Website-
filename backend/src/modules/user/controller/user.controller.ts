@@ -1,5 +1,6 @@
 import {
   Body,
+  Req,
   ClassSerializerInterceptor,
   Controller,
   Delete,
@@ -8,6 +9,7 @@ import {
   Param,
   Patch,
   Query,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
@@ -15,7 +17,7 @@ import { AuthGuard } from "src/guards/auth.guard";
 import { RoleGuard, Roles } from "src/guards/role.guard";
 import { UserService } from "../services/user.service";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { multerOptions } from "./multerconfig";
+import { multerOptions} from "../../../multerconfig/multerconfig";
 import * as jwt from "jsonwebtoken";
 
 @Controller("user")
@@ -27,14 +29,13 @@ export class UserController {
   @Get()
   @HttpCode(200)
   @UseGuards(RoleGuard)
-  @Roles("admin")
+  @Roles(["admin"])
   getallusers(@Query() params: any) {
     return this.services.getallusers(params);
   }
 
   @Get("/:id")
   @HttpCode(200)
-  @UseGuards(RoleGuard)
   getuser(@Param("id") id: string , @Body() data: any) {
     return this.services.getuser(id,data);
   }
@@ -42,15 +43,19 @@ export class UserController {
   @Delete("/:id")
   @HttpCode(200)
   @UseGuards(RoleGuard)
-  @Roles("admin")
+  @Roles(["admin"])
   deleteuser(@Param("id") id: string) {
     return this.services.deleteuser(id);
   }
   
   @Patch("/:id")
   @HttpCode(200)
-  @UseGuards(RoleGuard)
-  modifyuser(@Param("id") id: string, @Body() data: any) {
-    return this.services.updateuser(id, data);
+  @UseInterceptors(FileInterceptor('image',multerOptions))
+  modifyuser(@Param("id") id: string, @Req() req:any, @UploadedFile() file:  Express.Multer.File) {
+    const token = req.headers.authorization?.split(" ")[1];
+    const jwtd = jwt.verify(token, process.env.JWT_SECRET);
+    const data = {...req.body}
+    file?data.image=file.filename:delete data.image;
+    return this.services.updateuser(id,{data,jwt:jwtd})
   }
 }

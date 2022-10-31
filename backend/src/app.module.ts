@@ -7,6 +7,8 @@ import { BikesModule } from "./modules/bikes/bikes.module";
 import { ReservationModule } from "./modules/reservation/reservation.module";
 import { ReviewModule } from "./modules/review/review.module";
 import { UserModule } from "./modules/user/user.module";
+import {ServeStaticModule} from "@nestjs/serve-static"
+import { join } from "path";
 
 @Module({
   imports: [
@@ -15,8 +17,10 @@ import { UserModule } from "./modules/user/user.module";
     BikesModule,
     ReviewModule,
     ReservationModule,
-    TypeOrmModule.forRoot(typeormconfig),
     ConfigModule.forRoot(),
-  ],
+    TypeOrmModule.forRoot(typeormconfig),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+    }),  ],
 })
 export class AppModule {}

@@ -1,7 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import fs from "fs";
 import { User } from "src/database";
 import { Serialized_user } from "src/dto/user.dto";
+import { multerConfig } from "src/multerconfig/multerconfig";
 import { Repository } from "typeorm";
 
 @Injectable()
@@ -65,14 +67,13 @@ export class UserService {
   }
 
   async updateuser(id: string, data: any) {
-    if (data.jwt.role === "regular" && id !== data.jwt.id) {
+    if (["regular", "manager"].includes(data.jwt.role) && id !== data.jwt.id) {
       throw new HttpException("FORBIDDEN", HttpStatus.FORBIDDEN);
     }
-    if (data.jwt.role === "regular" && data.data.role) {
+    if (["regular", "manager"].includes(data.jwt.role) && data.data.role) {
       delete data.data.role;
     }
-    if(data.data.email)
-    data.data.email = data.data.email.toLowerCase();
+    if (data.data.email) data.data.email = data.data.email.toLowerCase();
     try {
       const res = await this.userrepo.findOneBy({ id: id });
       if (!res)
@@ -81,6 +82,9 @@ export class UserService {
         const res = await this.userrepo.findOneBy({ email: data.data.email });
         if (res)
           throw new HttpException("Email Already Exists", HttpStatus.CONFLICT);
+      }
+      if (data.data?.image && res.image) {
+        fs.unlink(`${multerConfig}/${res.image}`, undefined);
       }
       await this.userrepo
         .createQueryBuilder()

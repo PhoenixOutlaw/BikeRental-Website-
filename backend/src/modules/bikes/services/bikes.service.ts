@@ -68,7 +68,7 @@ export class BikesService {
         total: 10,
         data: {
           available: available,
-          unavailable: data.jwt.role === "admin" ? reserved : [],
+          unavailable: ["admin","manager"].includes(data.jwt.role) ? reserved : [],
         },
       };
     } catch (err) {
@@ -78,7 +78,7 @@ export class BikesService {
 
   async getbike(id: string, role: string) {
     const relations = ["reviews"];
-    if (role === "admin") relations.push("reservations");
+    if (["admin","manager"].includes(role)) relations.push("reservations");
     try {
       const res = await this.bikerepo.findOneOrFail({
         where: { id: id },

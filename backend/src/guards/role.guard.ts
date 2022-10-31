@@ -13,8 +13,8 @@ export class RoleGuard implements CanActivate {
     if (!roles) {
       return true;
     }
-    return roles.toString() === req.body.jwt.role;
+    return roles.flat().includes(req.body.jwt.role);
   }
 }
 
-export const Roles = (...roles: string[]) => SetMetadata("roles", roles);
+export const Roles = (...roles: string[][]) => SetMetadata("roles", roles);
