@@ -9,7 +9,7 @@ export const getallbikes = createAsyncThunk(
     try {
       const query =
         (filter.name ? `&name=${filter.name}` : "") +
-        (filter.rating ? `&rating=${filter.rating}` : "") +
+        (filter.rating ? `&avgrating=${filter.rating}` : "") +
         (filter.model ? `&model=${filter.model}` : "") +
         (filter.color ? `&color=${filter.color}` : "") +
         (filter.location ? `&location=${filter.location}` : "") +

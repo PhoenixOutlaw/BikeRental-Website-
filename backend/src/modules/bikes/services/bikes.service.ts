@@ -24,6 +24,7 @@ export class BikesService {
   }
 
   async getallbike(params: any, data: any) {
+    
     try {
       const { from, to, page, limit, ...filter } = params;
       const pagination = {
@@ -52,7 +53,6 @@ export class BikesService {
           })
         )
         .getMany();
-
       let query = this.bikerepo.createQueryBuilder("bike").where({ ...filter });
       if (reserved.length) {
         query = query.andWhere("bike.id NOT IN (:reserved)", {
