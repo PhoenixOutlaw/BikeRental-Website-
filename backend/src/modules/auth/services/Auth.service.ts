@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import * as jwt from "jsonwebtoken";
-// import { User } from ";
+import { User } from "src/database";
 import {
   Create_UserDto,
   Serialized_user,
@@ -9,7 +9,6 @@ import {
 } from "src/dto/user.dto";
 import * as bcrypt from "bcrypt";
 import { Repository } from "typeorm";
-import { User } from "src/entity/user.entity";
 
 @Injectable()
 export class AuthService {

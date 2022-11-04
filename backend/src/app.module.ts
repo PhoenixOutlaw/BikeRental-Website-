@@ -8,6 +8,7 @@ import { ReviewModule } from "./modules/review/review.module";
 import { UserModule } from "./modules/user/user.module";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
+import { AppController } from "./app.controller";
 
 @Module({
   imports: [
@@ -22,5 +23,8 @@ import { join } from "path";
       rootPath: join(__dirname, "..", "uploads"),
     }),
   ],
+  controllers:[
+    AppController,
+  ]
 })
 export class AppModule {}
