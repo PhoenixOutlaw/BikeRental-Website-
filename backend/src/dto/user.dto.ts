@@ -17,7 +17,7 @@ export class Create_UserDto  {
     email: string;
 
     @IsOptional()
-    @Matches(/(admin)|(regular)/,{message: 'role can me admin or regular only'}) 
+    @Matches(/(admin)|(regular)|(manager)/,{message: 'role can be admin, manager or regular only'}) 
     role: string;
     
     @IsString()

@@ -7,7 +7,7 @@ const multer_1 = require("multer");
 const uuid_1 = require("uuid");
 const common_1 = require("@nestjs/common");
 exports.multerConfig = {
-    dest: './uploads',
+    dest: "./uploads",
 };
 exports.multerOptions = {
     fileFilter: (req, file, cb) => {

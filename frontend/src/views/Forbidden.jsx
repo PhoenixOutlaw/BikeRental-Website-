@@ -1,10 +1,5 @@
-import React from 'react'
+import React from "react";
 
 export const Forbidden = () => {
-  return (
-    <div>
-        Forbidden
-        
-        </div>
-  )
-}
+  return <div>Forbidden</div>;
+};

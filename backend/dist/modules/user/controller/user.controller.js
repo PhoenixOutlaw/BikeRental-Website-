@@ -14,8 +14,8 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 const common_1 = require("@nestjs/common");
-const auth_guard_1 = require("../../../guards/auth.guard");
-const role_guard_1 = require("../../../guards/role.guard");
+const auth_guard_1 = require("src/guards/auth.guard");
+const role_guard_1 = require("src/guards/role.guard");
 const user_service_1 = require("../services/user.service");
 const platform_express_1 = require("@nestjs/platform-express");
 const multerconfig_1 = require("../../../multerconfig/multerconfig");

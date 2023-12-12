@@ -1,4 +1,3 @@
-/// <reference types="multer" />
 export declare const multerConfig: {
     dest: string;
 };

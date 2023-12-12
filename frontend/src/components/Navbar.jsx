@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { signout } from "../redux/features/login/loginSlice";
 import { Avatar, Dropdown, Menu, Space } from "antd";
 import { UserOutlined } from "@ant-design/icons";
+import { baseURL } from "../axios/axiosconfig";
+
 
 const links = [
   {
@@ -51,7 +53,7 @@ export const Navbar = () => {
       </div>
       <Dropdown overlay={menu}>
         <Space>
-          <Avatar size={45} src={user?.image?`http://localhost:5000/${user?.image}`:null} icon={<UserOutlined />} />
+          <Avatar size={45} src={user?.image?(baseURL+'/'+user?.image):null} icon={<UserOutlined />} />
         </Space>
       </Dropdown>
     </div>

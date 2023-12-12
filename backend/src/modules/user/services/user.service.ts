@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import fs from "fs";
+import * as fs from "fs";
 import { User } from "src/database";
 import { Serialized_user } from "src/dto/user.dto";
 import { multerConfig } from "src/multerconfig/multerconfig";
@@ -83,8 +83,8 @@ export class UserService {
         if (res)
           throw new HttpException("Email Already Exists", HttpStatus.CONFLICT);
       }
-      if (data.data?.image && res.image) {
-        fs.unlink(`${multerConfig}/${res.image}`, undefined);
+      if (data.data.image && res.image) {
+        fs.unlink(`${multerConfig.dest}/${res.image}`,()=>null);
       }
       await this.userrepo
         .createQueryBuilder()
@@ -93,6 +93,7 @@ export class UserService {
         .where({ id: id })
         .execute();
       return "updated";
+
     } catch (err) {
       throw new HttpException(err.message, err.status);
     }

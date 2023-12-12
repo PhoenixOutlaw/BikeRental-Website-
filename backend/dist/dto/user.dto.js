@@ -31,7 +31,7 @@ __decorate([
 ], Create_UserDto.prototype, "email", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.Matches)(/(admin)|(regular)/, { message: 'role can me admin or regular only' }),
+    (0, class_validator_1.Matches)(/(admin)|(regular)|(manager)/, { message: 'role can be admin, manager or regular only' }),
     __metadata("design:type", String)
 ], Create_UserDto.prototype, "role", void 0);
 __decorate([

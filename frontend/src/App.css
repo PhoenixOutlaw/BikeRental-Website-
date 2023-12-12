@@ -1,6 +1,24 @@
 /* .App {  text-align: center; } */
+.font-size-1 {
+  font-size: 1rem;
+}
+.font-size-2 {
+  font-size: 2rem;
+}
+.font-size-4 {
+  font-size: 4rem;
+}
 .light-gray {
   color: rgb(111, 111, 111);
+}
+.self-centered {
+  align-self: center;
+}
+.black {
+  color: "black";
+}
+.red {
+  color: "red";
 }
 
 .box-shadow {
@@ -85,6 +103,12 @@
 .margin-auto {
   margin: auto;
 }
+.ml-auto {
+  margin-left: auto;
+}
+.mr-auto {
+  margin-right: auto;
+}
 .m0 {
   margin: 0;
 }
@@ -168,7 +192,15 @@
 .heading-s {
   font-size: 1.5rem;
 }
-
+.top-0 {
+  top: 0;
+}
+.height-fit {
+  height: fit-content;
+}
+.h-screen {
+  height: 100vh;
+}
 .p {
   text-transform: capitalize;
   font-weight: 500;
@@ -185,6 +217,12 @@
 
 .border {
   border: solid thin;
+}
+.border-1 {
+  border-width: 1px;
+}
+.w-10 {
+  width: 10rem;
 }
 
 .overflow-h,
@@ -300,9 +338,14 @@
   align-items: center;
   gap: 0.2rem;
 }
-.dot--red{color: rgb(247, 97, 97);}
-.dot--green{color: #27e359;}
-.dot--red::after,.dot--green::after {
+.dot--red {
+  color: rgb(247, 97, 97);
+}
+.dot--green {
+  color: #27e359;
+}
+.dot--red::after,
+.dot--green::after {
   content: "";
   display: inline-block;
   border: solid 0.3rem;

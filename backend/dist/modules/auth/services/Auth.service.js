@@ -42,7 +42,7 @@ let AuthService = class AuthService {
             if (!(await bcrypt.compare(data.password, res.password))) {
                 throw new common_1.HttpException("Password incorrect", common_1.HttpStatus.FORBIDDEN);
             }
-            const token = jwt.sign({ id: res.id, role: res.role }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_ACTIVE_DURATION });
+            const token = jwt.sign({ id: res.id, role: res.role }, process.env.JWT_SECRET);
             return { jwttoken: token, user: new user_dto_1.Serialized_user(res) };
         }
         catch (err) {

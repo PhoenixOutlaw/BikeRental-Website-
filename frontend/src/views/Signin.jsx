@@ -1,18 +1,18 @@
 import { Button, Checkbox, Form, Input, Typography, message } from "antd";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { trimspace } from "../utils/fnc";
 import validator from "validator";
-import React from "react";
 import {
   login,
   register as registerapi,
 } from "../redux/features/login/loginAPI";
-import { trimspace } from "../utils/fnc";
 
 export const Signin = ({ register }) => {
   const user = useSelector((state) => state.login.user);
   const dispatch = useDispatch();
   const nav = useNavigate();
+
   const onFinish = (values) => {
     if (!register) {
       dispatch(login({ data: values, success: () => nav("/") }));
@@ -50,10 +50,7 @@ export const Signin = ({ register }) => {
   return user ? (
     <Navigate to="/" />
   ) : (
-    <div
-      className="d-flex--c justify-center align-center"
-      style={{ height: "100vh" }}
-    >
+    <div className="d-flex--c justify-center align-center h-screen">
       <Form
         name="basic"
         initialValues={{
@@ -64,77 +61,24 @@ export const Signin = ({ register }) => {
         autoComplete="on"
       >
         <h1 className="text-center">{register ? "Register" : "login"}</h1>
-        {register && (
-          <>
+        {formFields.map((field) =>
+          field.for.includes(register ? "register" : "signin") ? (
             <Form.Item
-              label="FirstName"
-              name="firstName"
+              key={field.fieldName}
+              label={
+                field.fieldName[0].toUpperCase() + field.fieldName.slice(1)
+              }
+              name={field.fieldName}
               normalize={trimspace}
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your firstname!",
-                },
-              ]}
+              rules={field.rules}
             >
-              <Input />
+              {["password", "rePassword"].includes(field.fieldName) ? (
+                <Input.Password />
+              ) : (
+                <Input />
+              )}
             </Form.Item>
-            <Form.Item
-              label="LastName"
-              name="lastName"
-              normalize={trimspace}
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your lastname!",
-                },
-              ]}
-            >
-              <Input />
-            </Form.Item>
-          </>
-        )}
-        <Form.Item
-          label="Email"
-          name="email"
-          normalize={trimspace}
-          rules={[
-            {
-              required: true,
-              message: "Enter a valid email address!",
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Password"
-          name="password"
-          normalize={trimspace}
-          rules={[
-            {
-              required: true,
-              message: "Password too weak use A-z,a-z,0-9,(#,$,* etc)",
-            },
-          ]}
-        >
-          <Input.Password />
-        </Form.Item>
-
-        {register && (
-          <Form.Item
-            label="Confirm"
-            name="repassword"
-            normalize={trimspace}
-            rules={[
-              {
-                required: true,
-                message: "Please input your confirmation password!",
-              },
-            ]}
-          >
-            <Input.Password />
-          </Form.Item>
+          ) : null
         )}
         <div className="d-flex gutter-m justify-center p">
           {!register && (
@@ -162,3 +106,56 @@ export const Signin = ({ register }) => {
     </div>
   );
 };
+
+const formFields = [
+  {
+    fieldName: "firstName",
+    for: ["register"],
+    rules: [
+      {
+        required: true,
+        message: "Please input your firstname!",
+      },
+    ],
+  },
+  {
+    fieldName: " lastName",
+    for: ["register"],
+    rules: [
+      {
+        required: true,
+        message: "Please input your lastname!",
+      },
+    ],
+  },
+  {
+    fieldName: "email",
+    for: ["register", "signin"],
+    rules: [
+      {
+        required: true,
+        message: "Enter a valid email address!",
+      },
+    ],
+  },
+  {
+    fieldName: "password",
+    for: ["register", "signin"],
+    rules: [
+      {
+        required: true,
+        message: "Password too weak use A-z,a-z,0-9,(#,$,* etc)",
+      },
+    ],
+  },
+  {
+    fieldName: "rePassword",
+    for: ["register"],
+    rules: [
+      {
+        required: true,
+        message: "Please input your confirmation password!",
+      },
+    ],
+  },
+];

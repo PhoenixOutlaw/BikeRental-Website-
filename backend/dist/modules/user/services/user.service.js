@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
-const fs_1 = require("fs");
+const fs = require("fs");
 const database_1 = require("../../../database");
 const user_dto_1 = require("../../../dto/user.dto");
 const multerconfig_1 = require("../../../multerconfig/multerconfig");
@@ -80,7 +80,6 @@ let UserService = class UserService {
         }
     }
     async updateuser(id, data) {
-        var _a;
         if (["regular", "manager"].includes(data.jwt.role) && id !== data.jwt.id) {
             throw new common_1.HttpException("FORBIDDEN", common_1.HttpStatus.FORBIDDEN);
         }
@@ -98,8 +97,8 @@ let UserService = class UserService {
                 if (res)
                     throw new common_1.HttpException("Email Already Exists", common_1.HttpStatus.CONFLICT);
             }
-            if (((_a = data.data) === null || _a === void 0 ? void 0 : _a.image) && res.image) {
-                fs_1.default.unlink(`${multerconfig_1.multerConfig}/${res.image}`, undefined);
+            if (data.data.image && res.image) {
+                fs.unlink(`${multerconfig_1.multerConfig.dest}/${res.image}`, () => null);
             }
             await this.userrepo
                 .createQueryBuilder()

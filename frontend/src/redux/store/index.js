@@ -14,5 +14,3 @@ export const store = configureStore({
     admin: adminReducer,
   },
 });
-
-// store.subscribe( validjwt );

@@ -33,8 +33,6 @@ export class ReservationService {
           "reservation.bikeId = :id and ((reservation.from BETWEEN :from and :to  or reservation.to BETWEEN :from and :to) or (reservation.from <:from and reservation.to >:to))",
           { from: data.data.from, to: data.data.to, id: id }
         )
-        // .andWhere("reservation.from BETWEEN :from and :to  or reservation.to BETWEEN :from and :to", { from: data.data.from,to: data.data.to})
-        // .orWhere("(reservation.from <:from and reservation.to >:to)", { from: data.data.from ,  to: data.data.to})                                   ask??
         .getOne();
       if (reserved) {
         throw new HttpException(

@@ -46,7 +46,6 @@ export class AuthService {
       const token = jwt.sign(
         { id: res.id, role: res.role },
         process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_ACTIVE_DURATION }
       );
       return { jwttoken: token, user: new Serialized_user(res) };
     } catch (err) {

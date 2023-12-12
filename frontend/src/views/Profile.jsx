@@ -1,21 +1,14 @@
 import { getuser, updateuser } from "../redux/features/admin/apis/userapi";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  UploadOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
-import { useNavigate, useParams } from "react-router-dom";
-import { Avatar, Button, Form, Input, message, Modal, Upload } from "antd";
+import { EditOutlined, UserOutlined } from "@ant-design/icons";
+import { updateuserinfo } from "../redux/features/login/loginSlice";
+import { Avatar, Form, Input, message, Modal } from "antd";
+import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import React, { useEffect, useState } from "react";
-import { noupdates, trimspace, validjwt } from "../utils/fnc";
+import { trimspace, validjwt } from "../utils/fnc";
+import { baseURL } from "../axios/axiosconfig";
 import validator from "validator";
-import {
-  deletereservation,
-  updatereservation,
-} from "../redux/features/reservation/reservationAPI";
-import { updateuserinfo } from "../redux/features/login/loginSlice";
+import ReservationCard from "../components/profile/ReservationCard";
 
 const inputs = [
   {
@@ -31,19 +24,32 @@ const inputs = [
     name: "email",
   },
 ];
-// const options = ["regular", "admin"];
 
 const Profile = () => {
-  const storeduser = useSelector((state) => state.login.user);
+  const storedUser = useSelector((state) => state.login.user);
   const { id } = useParams();
-  const [user, setuser] = useState(storeduser);
-  const [updatevisible, setupdatevisible] = useState(false);
+  const [user, setUser] = useState(storedUser);
+  const [updateVisible, setUpdateVisible] = useState(false);
   const [form] = Form.useForm();
-  const [file, setfile] = useState(null);
-  const nav = useNavigate();
+  const [file, setFile] = useState(null);
+  const dispatch = useDispatch();
+
   function close() {
     form.resetFields();
-    setupdatevisible(false);
+    setUpdateVisible(false);
+  }
+  function updateuser_success() {
+    validjwt(() =>
+      dispatch(
+        getuser({
+          id: id ? id : user.id,
+          success: (data) => {
+            setUser(data);
+            dispatch(updateuserinfo(data));
+          },
+        })
+      )
+    );
   }
   const updateform = (values) => {
     if (!validator.isEmail(values.email)) {
@@ -57,42 +63,29 @@ const Profile = () => {
         lastName: values.lastName,
         email: values.email,
         image: file,
-        // role: values.role,
       },
     };
     validjwt(() =>
       dispatch(
         updateuser({
           ...updatevalue,
-          success: () =>
-            validjwt(() =>
-              dispatch(
-                getuser({
-                  id: id ? id : user.id,
-                  success: (data) => {
-                    setuser(data);
-                    dispatch(updateuserinfo(data));
-                  },
-                })
-              )
-            ),
+          success: updateuser_success,
         })
       )
     );
     form.resetFields();
-    setfile(null)
-    setupdatevisible(false);
+    setFile(null);
+    setUpdateVisible(false);
   };
 
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
   };
-  const dispatch = useDispatch();
 
   useEffect(() => {
     validjwt(() =>
       dispatch(
-        getuser({ id: id ? id : user.id, success: (data) => setuser(data) })
+        getuser({ id: id ? id : user.id, success: (data) => setUser(data) })
       )
     );
   }, [id, dispatch, user.id]);
@@ -100,14 +93,12 @@ const Profile = () => {
   useEffect(() => {
     if (form.__INTERNAL__.name) form.setFieldsValue(user);
   }, [form, user]);
- 
 
   return (
     <div className="d-flex justify-center gutter-m margin-top-s">
       <Modal
         title="update user"
-        visible={updatevisible}
-        // onOk={() => noupdates(user, form)}
+        visible={updateVisible}
         onOk={() => form.submit()}
         onCancel={close}
       >
@@ -125,19 +116,8 @@ const Profile = () => {
             <Input
               type="file"
               accept="image/*"
-              onChange={(e) => setfile(e.target.files[0])}
+              onChange={(e) => setFile(e.target.files[0])}
             />
-            {/* <Upload
-              listType="picture"
-              
-              customRequest={({file,onSuccess})=>{
-                setTimeout(() => {
-                  onSuccess("ok");
-                }, 0);
-              }}
-            >
-              <Button icon={<UploadOutlined />}>Upload</Button>
-            </Upload> */}
           </Form.Item>
           {inputs.map((input, i) => (
             <Form.Item
@@ -157,30 +137,18 @@ const Profile = () => {
               <Input placeholder={user[Object.keys(user)[i + 1]]} />
             </Form.Item>
           ))}
-          {/* <div className="d-flex justify-center full-width">
-            <Form.Item label="roles" name="role" style={{ width: "10rem" }}>
-              <Select placeholder={user?.role}>
-                {options.map((i) => (
-                  <Select.Option key={i} value={i}>
-                    {i}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </div> */}
         </Form>
       </Modal>
       <div className="profile d-flex--c align-center box-shadow padding-lr-m padding-bottom-m padding-top-m position-relative">
         <EditOutlined
-          className="position-absolute btn-edit btn"
-          style={{ fontSize: "1rem", top: "5%", right: "10%", color: "black" }}
-          onClick={() => setupdatevisible(true)}
+          className="btn-edit btn ml-auto font-size-1 black"
+          onClick={() => setUpdateVisible(true)}
         />
         <div className="d-flex">
           <Avatar
             size={120}
             shape="square"
-            src={user?.image ? `http://localhost:5000/${user?.image}` : null}
+            src={user?.image ? baseURL + "/" + user?.image : null}
             icon={<UserOutlined />}
           />
         </div>
@@ -200,86 +168,14 @@ const Profile = () => {
           {id ? "users" : "your"} Reservations
         </h3>
         {user.reservations?.map((e) => (
-          <div
-            className=" border d-flex gutter-s margin-bottom-s padding-bottom-s padding-top-s padding-lr-s"
+          <ReservationCard
             key={e.id}
-          >
-            <div>
-              <p className="p p-s m0">name: {e.bike.name}</p>
-              <p className="p p-s m0">model: {e.bike.model}</p>
-              {e.active ? (
-                <p className="p p-s text dot dot--green">active</p>
-              ) : (
-                <p className="p p-s text dot dot--red">canceled</p>
-              )}
-              <p className="p p-s m0" style={{ color: "red" }}>
-                from: {e.from}
-              </p>
-              <p className="p p-s m0" style={{ color: "red" }}>
-                to: {e.to}
-              </p>
-              <div className="d-flex gutter-s">
-                {e.active && storeduser.id === user.id && (
-                  <button
-                    className="btn btn-secondary margin-top-s "
-                    onClick={() =>
-                      validjwt(() =>
-                        dispatch(
-                          updatereservation({
-                            id: e.id,
-                            updates: { active: false },
-                            success: () =>
-                              validjwt(() =>
-                                dispatch(
-                                  getuser({
-                                    id: id ? id : user.id,
-                                    success: (data) => setuser(data),
-                                  })
-                                )
-                              ),
-                          })
-                        )
-                      )
-                    }
-                  >
-                    cancel
-                  </button>
-                )}
-                <button
-                  className="btn btn-secondary margin-top-s"
-                  onClick={() => nav(`/bike/${e.bike.id}`)}
-                >
-                  show more
-                </button>
-              </div>
-            </div>
-            {storeduser.id === user.id && (
-              <div>
-                <DeleteOutlined
-                  style={{ fontSize: "1rem" }}
-                  className="btn btn-delete"
-                  onClick={() =>
-                    validjwt(() =>
-                      dispatch(
-                        deletereservation({
-                          id: e.id,
-                          success: () =>
-                            validjwt(() =>
-                              dispatch(
-                                getuser({
-                                  id: id ? id : user.id,
-                                  success: (data) => setuser(data),
-                                })
-                              )
-                            ),
-                        })
-                      )
-                    )
-                  }
-                />
-              </div>
-            )}
-          </div>
+            id={id}
+            data={e}
+            user={user}
+            setUser={setUser}
+            storedUser={storedUser}
+          />
         ))}
       </div>
     </div>

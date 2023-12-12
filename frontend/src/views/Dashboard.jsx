@@ -6,16 +6,9 @@ import { useDispatch, useSelector } from "react-redux";
 import React, { useEffect, useState } from "react";
 import { noupdates, trimspace, validjwt } from "../utils/fnc";
 import validator from "validator";
-import {
-  deleteuser,
-  getalluser,
-  updateuser,
-} from "../redux/features/admin/apis/userapi";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  PlusSquareOutlined,
-} from "@ant-design/icons";
+import { getalluser, updateuser } from "../redux/features/admin/apis/userapi";
+import { PlusSquareOutlined } from "@ant-design/icons";
+import UserCard from "../components/dashboard/UserCard";
 
 const inputs = [
   {
@@ -44,7 +37,7 @@ const inputcreate = [
     name: "repassword",
   },
 ];
-const options = ["regular", "admin","manager"];
+const options = ["regular", "admin", "manager"];
 
 const Dashboard = () => {
   const role = useSelector((state) => state.login.user.role);
@@ -174,7 +167,7 @@ const Dashboard = () => {
             ))}
 
             <div className="d-flex justify-center full-width">
-              <Form.Item label="roles" name="role" style={{ width: "10rem" }}>
+              <Form.Item label="roles" name="role" className="w-10">
                 <Select placeholder={currentuser?.role}>
                   {options.map((i) => (
                     <Select.Option key={i} value={i}>
@@ -192,7 +185,10 @@ const Dashboard = () => {
         title="create user"
         visible={visible}
         onOk={() => {
-          if (createform.getFieldValue.length !== inputcreate.length) {
+          if (
+            Object.keys(createform.getFieldValue()).length !==
+            inputcreate.length + 1
+          ) {
             message.error("all fields are required");
             return null;
           }
@@ -214,7 +210,6 @@ const Dashboard = () => {
             span: 16,
           }}
           onFinish={createuser}
-          // onFinishFailed={onFinishFailed}
           autoComplete="off"
         >
           {inputcreate.map((input, i) => (
@@ -237,7 +232,7 @@ const Dashboard = () => {
             <Form.Item
               label="roles"
               name="role"
-              style={{ width: "10rem" }}
+              className="w-10"
               rules={[
                 {
                   required: true,
@@ -261,8 +256,7 @@ const Dashboard = () => {
         <h1 className="m0 heading heading-m text-center">Users</h1>
         {role === "admin" && (
           <div
-            className="btn p-m"
-            style={{ fontSize: "2rem" }}
+            className="btn p-m font-size-10"
             onClick={() => setvisible(true)}
           >
             <PlusSquareOutlined />
@@ -283,42 +277,7 @@ const Dashboard = () => {
       {users?.length > 0 ? (
         users?.map((user) =>
           user.id === userid ? null : (
-            <div
-              key={user.id}
-              className="d-flex box-shadow p p-s padding-lr-m padding-top-s padding-bottom-s justify-sb margin-bottom-s"
-            >
-              <div>
-                <p className="m0">Id : {user.id}</p>
-                <p className="m0">
-                  Name : {user.firstName} {user.lastName}
-                </p>
-                <p className="m0">Email : {user.email}</p>
-                <p className="m0">Role : {user.role}</p>
-              </div>
-              <div className="admin d-flex--c gutter-s padding-lr-s justify-right">
-                <EditOutlined
-                  className="btn btn-edit p-m"
-                  onClick={() => {
-                    dispatch(setcurrentuser(user));
-                    setupdatevisible(true);
-                  }}
-                />
-                <DeleteOutlined
-                  className="btn btn-delete p-m"
-                  onClick={() => {
-                    validjwt(() => dispatch(deleteuser(user.id)));
-                  }}
-                />
-                <button
-                  className="btn btn-secondary"
-                  onClick={() => {
-                    nav(`/user/${user.id}`);
-                  }}
-                >
-                  More details
-                </button>
-              </div>
-            </div>
+            <UserCard user={user} setupdatevisible={setupdatevisible} />
           )
         )
       ) : (

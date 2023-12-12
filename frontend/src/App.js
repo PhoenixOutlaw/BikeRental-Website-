@@ -1,9 +1,8 @@
+import { getloggeduser } from "./redux/features/login/loginAPI";
 import { Navigate, Route, Routes } from "react-router-dom";
 import React, { lazy, Suspense, useState } from "react";
-import { getloggeduser } from "./redux/features/login/loginAPI";
 import { useDispatch, useSelector } from "react-redux";
 import { Bars } from "react-loader-spinner";
-import { Bikes } from "./components/Bikes";
 import { Auth } from "./components/Auth";
 import { Signin } from "./views/Signin";
 import { validjwt } from "./utils/fnc";
@@ -13,8 +12,8 @@ import { useEffect } from "react";
 import Cookies from "js-cookie";
 import "antd/dist/antd.min.css";
 import "./App.css";
-
-const  Bike = lazy(()=> import("./components/Bike"));
+import { Bikes } from "./views/Bikes";
+const  Bike = lazy(()=> import("./views/Bike"));
 const  Dashboard = lazy(()=> import("./views/Dashboard"));
 const  Profile = lazy(()=> import("./views/Profile"));
 
